@@ -13,6 +13,7 @@ export default function Sidebar() {
     { name: "Coursiers", path: "/admin/couriers" },
     { name: "Commandes", path: "/admin/orders" },
     { name: "Utilisateurs", path: "/admin/users" },
+    { name: "Collaborateurs", path: "/admin/collaborators" },
   ];
 
   return (
