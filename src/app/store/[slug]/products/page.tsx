@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 
-export default function StoreProductsPage({ params }: { params: { slug: string } }) {
+export default function StoreProductsPage() {
   // MOCK: Dans une vraie application, on ferait un fetch /api/stores/[slug]/products
   const [products, setProducts] = useState([
     { id: "1", name: "Riz Parfumé 5kg", price: 6.5, inStock: true },
