@@ -5,7 +5,7 @@ if (!process.env.STRIPE_SECRET_KEY) {
 }
 
 export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: "2024-04-10", // Use the latest API version or your preferred one
+  apiVersion: "2026-06-24.dahlia", // Use the latest API version or your preferred one
   appInfo: {
     name: "Maykaba",
     version: "0.1.0",
