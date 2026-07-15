@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { NextResponse } from 'next/server';
 import { prisma } from "@/lib/prisma";
 // import { stripe } from '@/lib/stripe'; // Pour plus tard quand on activera Stripe Connect
