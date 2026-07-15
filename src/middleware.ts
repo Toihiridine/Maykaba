@@ -7,28 +7,29 @@ export default withAuth(
     const path = req.nextUrl.pathname;
 
     // Protéger l'accès Admin
-    if (path.startsWith("/admin") && token?.role !== "ADMIN") {
-      return NextResponse.redirect(new URL("/login", req.url));
+    if (path.startsWith("/admin") && path !== "/admin/login") {
+      if (token?.role !== "ADMIN") {
+        return NextResponse.redirect(new URL("/admin/login", req.url));
+      }
     }
 
-    // Protéger l'accès Store Manager
-    if (path.startsWith("/store") && token?.role !== "STORE_MANAGER" && token?.role !== "ADMIN") {
-      return NextResponse.redirect(new URL("/login", req.url));
+    // Protéger l'accès Partenaire (STORE_MANAGER)
+    if (path.startsWith("/partenaire") && path !== "/partenaire/login") {
+      if (token?.role !== "STORE_MANAGER" && token?.role !== "ADMIN") {
+        return NextResponse.redirect(new URL("/partenaire/login", req.url));
+      }
     }
 
     return NextResponse.next();
   },
   {
     callbacks: {
-      authorized: ({ token }) => !!token,
-    },
-    pages: {
-      signIn: "/login",
+      authorized: () => true, // On laisse le middleware gérer la redirection manuellement
     },
   }
 );
 
-// Appliquer le middleware uniquement sur les tableaux de bord (ne pas bloquer l'API)
+// Appliquer le middleware uniquement sur les tableaux de bord
 export const config = {
-  matcher: ["/admin/:path*", "/store/:path*"],
+  matcher: ["/admin/:path*", "/partenaire/:path*"],
 };
