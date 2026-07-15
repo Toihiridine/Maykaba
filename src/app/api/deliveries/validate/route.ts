@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from "@/lib/prisma";
 // import { stripe } from '@/lib/stripe'; // Pour plus tard quand on activera Stripe Connect
 
-const prisma = new PrismaClient();
+
 
 export async function POST(req: Request) {
   try {

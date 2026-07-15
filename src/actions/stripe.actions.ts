@@ -1,9 +1,9 @@
 "use server";
 
 import { stripe } from "@/lib/stripe";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
 
-const prisma = new PrismaClient();
+
 
 /**
  * Crée un compte Stripe Connect (Express) pour un Magasin ou un Coursier.
