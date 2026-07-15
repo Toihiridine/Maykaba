@@ -1,0 +1,109 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// Enum for User Roles
+enum Role {
+  ADMIN
+  STORE_MANAGER
+  CLIENT
+  COURIER
+}
+
+// Enum for Order Status
+enum OrderStatus {
+  PENDING
+  NEGOTIATED
+  PAID_ESCROW
+  PICKED_UP
+  COMPLETED
+  DISPUTED
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  password  String // Note: Should be hashed!
+  role      Role     @default(CLIENT)
+  phone     String?
+  stripeAccountId String? // For Couriers (Stripe Connect)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  stores   Store[] // For STORE_MANAGER
+  orders   Order[] // For CLIENT
+  deliveries Order[] @relation("CourierDeliveries") // For COURIER
+}
+
+model Store {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  name        String
+  description String?
+  address     String
+  latitude    Float?
+  longitude   Float?
+  ownerId     String
+  stripeAccountId String? // For Stores (Stripe Connect)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  owner    User      @relation(fields: [ownerId], references: [id])
+  products Product[]
+  orders   Order[]
+}
+
+model Product {
+  id          String   @id @default(cuid())
+  storeId     String
+  name        String
+  description String?
+  price       Float
+  imageUrl    String?
+  inStock     Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  store Store @relation(fields: [storeId], references: [id])
+  orderItems OrderItem[]
+}
+
+model Order {
+  id              String      @id @default(cuid())
+  clientId        String
+  storeId         String
+  courierId       String?
+  status          OrderStatus @default(PENDING)
+  totalAmount     Float
+  deliveryFee     Float
+  deliveryAddress String
+  pinCode         String?     // 4-digit PIN for validation
+  orderNumber     String?     @unique // e.g. CMD-8492
+  storeValidatedPickup   Boolean @default(false)
+  courierValidatedPickup Boolean @default(false)
+  stripePaymentId String?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  client   User        @relation(fields: [clientId], references: [id])
+  store    Store       @relation(fields: [storeId], references: [id])
+  courier  User?       @relation("CourierDeliveries", fields: [courierId], references: [id])
+  items    OrderItem[]
+}
+
+model OrderItem {
+  id        String   @id @default(cuid())
+  orderId   String
+  productId String
+  quantity  Int
+  price     Float    // Price at the time of order
+
+  order   Order   @relation(fields: [orderId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
+}
