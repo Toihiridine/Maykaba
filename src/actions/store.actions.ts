@@ -35,9 +35,11 @@ export async function getStoreProducts(storeId: string) {
 
 export async function createStore(data: { name: string; address: string; ownerId: string }) {
   try {
+    const slug = data.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
     const store = await prisma.store.create({
       data: {
         name: data.name,
+        slug,
         address: data.address,
         ownerId: data.ownerId,
       },
