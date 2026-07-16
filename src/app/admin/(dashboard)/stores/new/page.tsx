@@ -65,9 +65,15 @@ export default function NewStorePage() {
               <input type="url" name="logoUrl" className="w-full px-4 py-2 border rounded-xl focus:ring-[#F59E0B] focus:border-[#F59E0B]" placeholder="https://..." />
             </div>
 
-            <div className="space-y-1">
-              <label className="text-sm font-medium text-gray-700">Adresse Physique</label>
-              <input type="text" name="address" className="w-full px-4 py-2 border rounded-xl focus:ring-[#F59E0B] focus:border-[#F59E0B]" placeholder="Ex: 12 Rue de Kawéni, Mamoudzou" />
+            <div className="grid grid-cols-2 gap-6">
+              <div className="space-y-1">
+                <label className="text-sm font-medium text-gray-700">Adresse Physique</label>
+                <input type="text" name="address" className="w-full px-4 py-2 border rounded-xl focus:ring-[#F59E0B] focus:border-[#F59E0B]" placeholder="Ex: 12 Rue de Kawéni, Mamoudzou" />
+              </div>
+              <div className="space-y-1">
+                <label className="text-sm font-medium text-gray-700">Numéro de téléphone</label>
+                <input type="tel" name="storePhone" className="w-full px-4 py-2 border rounded-xl focus:ring-[#F59E0B] focus:border-[#F59E0B]" placeholder="Ex: 06 39 00 00 00" />
+              </div>
             </div>
           </section>
 

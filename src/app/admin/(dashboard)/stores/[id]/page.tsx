@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import StoreActions from "./StoreActions";
 
 export default async function StoreDetailsPage({
   params,
@@ -55,14 +56,7 @@ export default async function StoreDetailsPage({
           </Link>
           <h3 className="text-2xl font-bold text-[#0F4C81]">Détails du Magasin</h3>
         </div>
-        <div className="flex space-x-3">
-          <button className="px-4 py-2 bg-red-50 text-red-600 rounded-xl font-medium hover:bg-red-100 transition">
-            Suspendre
-          </button>
-          <button className="px-4 py-2 bg-[#0F4C81] text-white rounded-xl font-medium hover:bg-[#1E3A8A] transition">
-            Éditer
-          </button>
-        </div>
+        <StoreActions store={store} />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -78,7 +72,12 @@ export default async function StoreDetailsPage({
             )}
             
             <div className="space-y-1 flex-1">
-              <h1 className="text-2xl font-bold text-gray-900">{store.name}</h1>
+              <h1 className="text-2xl font-bold text-gray-900">
+                {store.name}
+                {store.status === "SUSPENDED" && (
+                  <span className="ml-3 px-2 py-1 bg-red-100 text-red-600 text-xs font-bold rounded-lg uppercase">Suspendu</span>
+                )}
+              </h1>
               <p className="text-gray-500 font-medium">Slug: <span className="text-gray-800">/{store.slug}</span></p>
               <p className="text-gray-500 flex items-center mt-2">
                 📍 {store.address}
@@ -111,6 +110,10 @@ export default async function StoreDetailsPage({
             <div>
               <p className="text-sm text-gray-500">Nom Complet</p>
               <p className="font-medium text-gray-900">{store.owner?.name || "Gérant introuvable"}</p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-500">Téléphone</p>
+              <p className="font-medium text-gray-900">{store.phone || "Non renseigné"}</p>
             </div>
             <div>
               <p className="text-sm text-gray-500">Email</p>
