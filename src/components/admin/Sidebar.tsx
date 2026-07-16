@@ -10,7 +10,7 @@ export default function Sidebar() {
   const navItems = [
     { name: "Tableau de bord", path: "/admin" },
     { name: "Magasins", path: "/admin/stores" },
-    { name: "Coursiers", path: "/admin/couriers" },
+    { name: "Coursiers", path: "/admin/coursiers" },
     { name: "Commandes", path: "/admin/orders" },
     { name: "Utilisateurs", path: "/admin/users" },
     { name: "Collaborateurs", path: "/admin/collaborators" },

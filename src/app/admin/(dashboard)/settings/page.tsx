@@ -1,7 +1,8 @@
 export const dynamic = "force-dynamic";
 
 import { supabaseAdmin } from "@/lib/supabase";
-import MediaGallery from "./MediaGallery";
+import { getSettingsAction } from "@/actions/settings";
+import SettingsTabs from "./SettingsTabs";
 
 export default async function SettingsPage() {
   const BUCKET_NAME = "media";
@@ -11,7 +12,6 @@ export default async function SettingsPage() {
   try {
     const { data } = await supabaseAdmin.storage.from(BUCKET_NAME).list();
     if (data) {
-      // Filter out hidden folders/files like .emptyFolderPlaceholder
       files = data.filter((file) => file.name !== ".emptyFolderPlaceholder");
     }
     
@@ -21,21 +21,29 @@ export default async function SettingsPage() {
     console.error("Error fetching media from Supabase:", e);
   }
 
+  // Fetch all global settings
+  const initialSettings = await getSettingsAction([
+    "maykaba_logo_url",
+    "maykaba_favicon_url",
+    "stripe_test_publishable_key",
+    "stripe_test_secret_key",
+    "stripe_prod_publishable_key",
+    "stripe_prod_secret_key",
+    "stripe_live_mode",
+  ]);
+
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 max-w-6xl mx-auto">
       <div>
-        <h2 className="text-2xl font-bold text-gray-900">Paramètres Généraux</h2>
-        <p className="text-gray-500">Gérez les médias et la configuration globale de l'application.</p>
+        <h2 className="text-2xl font-bold text-[#0F4C81]">Paramètres & Configuration</h2>
+        <p className="text-gray-500">Configurez l'ensemble de votre application (Identité, Paiements, Médias).</p>
       </div>
 
-      {/* Module Galerie de Médias */}
-      <MediaGallery initialFiles={files} publicUrlPrefix={publicUrlPrefix} />
-
-      {/* Autres paramètres (Placeholder pour l'avenir) */}
-      <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 opacity-50">
-        <h3 className="text-lg font-bold text-gray-800 border-b pb-2 mb-4">Configuration Stripe Connect</h3>
-        <p className="text-sm text-gray-500">Ce module sera activé prochainement pour gérer les pourcentages de commission.</p>
-      </div>
+      <SettingsTabs 
+        initialFiles={files} 
+        publicUrlPrefix={publicUrlPrefix} 
+        initialSettings={initialSettings} 
+      />
     </div>
   );
 }
