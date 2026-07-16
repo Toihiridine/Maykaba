@@ -50,7 +50,7 @@ export default async function PartnerOrdersPage() {
   };
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto pb-10">
+    <div className="space-y-6 pb-10">
       <div className="flex justify-between items-center">
         <div>
           <h2 className="text-2xl font-bold text-[#1F2937]">Commandes</h2>

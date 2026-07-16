@@ -25,7 +25,7 @@ export default async function PartnerProfilePage() {
   }
 
   return (
-    <div className="space-y-6 max-w-4xl mx-auto pb-10">
+    <div className="space-y-6 pb-10">
       <div>
         <h2 className="text-2xl font-bold text-[#1F2937]">Mon Magasin</h2>
         <p className="text-gray-500 text-sm">Gérez les informations publiques de votre boutique.</p>

@@ -44,7 +44,7 @@ export default async function PartnerOrderDetailPage({ params }: { params: Promi
   };
 
   return (
-    <div className="max-w-5xl mx-auto space-y-8 pb-10">
+    <div className="space-y-8 pb-10">
       {/* Header */}
       <div className="flex items-center space-x-4">
         <Link href="/partenaire/orders" className="p-2 bg-white rounded-xl shadow-sm border border-gray-100 hover:bg-gray-50 transition-colors">

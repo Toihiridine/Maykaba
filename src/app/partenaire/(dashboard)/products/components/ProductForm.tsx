@@ -71,7 +71,7 @@ export default function ProductForm({ storeId, initialData }: ProductFormProps) 
   };
 
   return (
-    <div className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100 max-w-3xl mx-auto">
+    <div className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100">
       <div className="mb-6 flex justify-between items-center">
         <div>
           <h2 className="text-xl font-bold text-gray-800">{isEditing ? "Modifier le produit" : "Ajouter un nouveau produit"}</h2>
