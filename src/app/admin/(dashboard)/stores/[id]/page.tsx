@@ -9,18 +9,37 @@ export default async function StoreDetailsPage({
 }) {
   const storeId = params.id;
 
-  const store = await prisma.store.findUnique({
-    where: { id: storeId },
-    include: {
-      owner: true,
-      _count: {
-        select: {
-          products: true,
-          orders: true,
+  let store: any;
+  try {
+    store = await prisma.store.findUnique({
+      where: { id: storeId },
+      include: {
+        owner: true,
+        _count: {
+          select: {
+            products: true,
+            orders: true,
+          },
         },
       },
-    },
-  });
+    });
+  } catch (error) {
+    // Fallback if the owner relation is broken in the database
+    store = await prisma.store.findUnique({
+      where: { id: storeId },
+      include: {
+        _count: {
+          select: {
+            products: true,
+            orders: true,
+          },
+        },
+      },
+    });
+    if (store) {
+      store.owner = null;
+    }
+  }
 
   if (!store) {
     notFound();
