@@ -1,15 +1,25 @@
 import React from "react";
-
 import Sidebar from "@/components/admin/Sidebar";
+import { getServerSession } from "next-auth";
+import { redirect } from "next/navigation";
 
-export default function AdminLayout({
+export default async function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const session = await getServerSession();
+  
+  if (!session || !session.user) {
+    redirect("/admin/login");
+  }
+
+  const permissions = (session.user as any).permissions || [];
+  const role = (session.user as any).role;
+
   return (
     <div className="min-h-screen bg-gray-50 flex">
-      <Sidebar />
+      <Sidebar userPermissions={permissions} userRole={role} />
       {/* Main Content */}
       <main className="flex-1 flex flex-col">
         <header className="h-16 bg-white shadow-sm flex items-center px-8">

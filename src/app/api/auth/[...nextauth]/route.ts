@@ -39,6 +39,7 @@ const handler = NextAuth({
           email: user.email,
           name: user.name,
           role: user.role,
+          permissions: user.permissions,
         };
       }
     })
@@ -48,6 +49,7 @@ const handler = NextAuth({
       if (user) {
         token.role = (user as any).role;
         token.id = user.id;
+        token.permissions = (user as any).permissions || [];
       }
       return token;
     },
@@ -55,6 +57,7 @@ const handler = NextAuth({
       if (session.user) {
         (session.user as any).role = token.role;
         (session.user as any).id = token.id;
+        (session.user as any).permissions = token.permissions || [];
       }
       return session;
     }

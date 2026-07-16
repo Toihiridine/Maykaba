@@ -3,6 +3,7 @@ export const dynamic = "force-dynamic";
 import { supabaseAdmin } from "@/lib/supabase";
 import { getSettingsAction } from "@/actions/settings";
 import SettingsTabs from "./SettingsTabs";
+import { prisma } from "@/lib/prisma";
 
 export default async function SettingsPage() {
   const BUCKET_NAME = "media";
@@ -32,17 +33,25 @@ export default async function SettingsPage() {
     "stripe_live_mode",
   ]);
 
+  // Fetch collaborators
+  const collaborators = await prisma.user.findMany({
+    where: { role: "ADMIN" },
+    orderBy: { createdAt: "desc" },
+    select: { id: true, name: true, email: true, permissions: true }
+  });
+
   return (
     <div className="space-y-6 max-w-6xl mx-auto">
       <div>
         <h2 className="text-2xl font-bold text-[#0F4C81]">Paramètres & Configuration</h2>
-        <p className="text-gray-500">Configurez l'ensemble de votre application (Identité, Paiements, Médias).</p>
+        <p className="text-gray-500">Configurez l'ensemble de votre application (Identité, Paiements, Médias, Droits).</p>
       </div>
 
       <SettingsTabs 
         initialFiles={files} 
         publicUrlPrefix={publicUrlPrefix} 
         initialSettings={initialSettings} 
+        collaborators={collaborators}
       />
     </div>
   );
