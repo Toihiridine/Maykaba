@@ -5,9 +5,10 @@ import { notFound } from "next/navigation";
 export default async function StoreDetailsPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
-  const storeId = params.id;
+  const resolvedParams = await params;
+  const storeId = resolvedParams.id;
 
   let store: any;
   try {

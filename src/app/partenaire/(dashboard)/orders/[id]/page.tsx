@@ -5,9 +5,11 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import PartnerOrderActions from "./PartnerOrderActions";
 
-export default async function PartnerOrderDetailPage({ params }: { params: { id: string } }) {
+export default async function PartnerOrderDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const resolvedParams = await params;
+  const orderId = resolvedParams.id;
   const order = await prisma.order.findUnique({
-    where: { id: params.id },
+    where: { id: orderId },
     include: {
       client: true,
       items: { include: { product: true } },

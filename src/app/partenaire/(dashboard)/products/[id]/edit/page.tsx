@@ -5,7 +5,9 @@ import { prisma } from "@/lib/prisma";
 import { redirect, notFound } from "next/navigation";
 import ProductForm from "../../components/ProductForm";
 
-export default async function EditProductPage({ params }: { params: { id: string } }) {
+export default async function EditProductPage({ params }: { params: Promise<{ id: string }> }) {
+  const resolvedParams = await params;
+  const productId = resolvedParams.id;
   const session = await getServerSession();
   const userId = (session?.user as any)?.id;
 
@@ -17,7 +19,7 @@ export default async function EditProductPage({ params }: { params: { id: string
   if (!store) redirect("/partenaire");
 
   const product = await prisma.product.findUnique({
-    where: { id: params.id }
+    where: { id: productId }
   });
 
   if (!product || product.storeId !== store.id) {
