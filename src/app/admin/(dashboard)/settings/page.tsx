@@ -41,7 +41,7 @@ export default async function SettingsPage() {
   });
 
   return (
-    <div className="space-y-6 max-w-6xl mx-auto">
+    <div className="space-y-6">
       <div>
         <h2 className="text-2xl font-bold text-[#0F4C81]">Paramètres & Configuration</h2>
         <p className="text-gray-500">Configurez l'ensemble de votre application (Identité, Paiements, Médias, Droits).</p>

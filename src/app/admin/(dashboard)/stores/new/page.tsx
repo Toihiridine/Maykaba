@@ -26,7 +26,7 @@ export default function NewStorePage() {
   }
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6">
+    <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h3 className="text-xl font-medium text-gray-800">Ajouter un Nouveau Magasin</h3>
         <button

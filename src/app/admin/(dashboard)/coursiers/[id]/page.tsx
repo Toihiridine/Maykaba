@@ -24,7 +24,7 @@ export default async function CourierDetailsPage({
   const profile = courier.courierProfile;
 
   return (
-    <div className="space-y-6 max-w-5xl mx-auto">
+    <div className="space-y-6">
       <div className="flex items-center space-x-4">
         <Link href="/admin/couriers" className="text-gray-500 hover:text-gray-800 transition">
           &larr; Retour aux coursiers
