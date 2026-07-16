@@ -52,7 +52,7 @@ export default function SalesChart({ data }: SalesChartProps) {
             contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
             labelStyle={{ fontWeight: 'bold', color: '#374151' }}
             itemStyle={{ color: '#F59E0B', fontWeight: 'bold' }}
-            formatter={(value: number) => [`${value.toFixed(2)} €`, 'Ventes']}
+            formatter={(value: any) => [`${Number(value).toFixed(2)} €`, 'Ventes']}
           />
           <Area
             type="monotone"
