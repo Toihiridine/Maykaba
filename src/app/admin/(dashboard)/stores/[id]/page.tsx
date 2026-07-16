@@ -90,11 +90,11 @@ export default async function StoreDetailsPage({
           <div className="space-y-3">
             <div>
               <p className="text-sm text-gray-500">Nom Complet</p>
-              <p className="font-medium text-gray-900">{store.owner.name}</p>
+              <p className="font-medium text-gray-900">{store.owner?.name || "Gérant introuvable"}</p>
             </div>
             <div>
               <p className="text-sm text-gray-500">Email</p>
-              <p className="font-medium text-[#0F4C81]">{store.owner.email}</p>
+              <p className="font-medium text-[#0F4C81]">{store.owner?.email || "N/A"}</p>
             </div>
             <div>
               <p className="text-sm text-gray-500">Statut du compte</p>
