@@ -3,7 +3,7 @@ export const dynamic = "force-dynamic";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { prisma } from "@/lib/prisma";
-import SalesChart from "@/components/partner/SalesChart";
+import SalesChartSection from "@/components/partner/SalesChartSection";
 import Link from "next/link";
 
 export default async function PartnerDashboardPage(props: { params: Promise<{ storeSlug: string }> }) {
@@ -42,6 +42,12 @@ export default async function PartnerDashboardPage(props: { params: Promise<{ st
   const activeOrders = store.orders.filter(o => ["PENDING", "NEGOTIATED", "PAID_ESCROW", "PREPARING", "READY_FOR_PICKUP"].includes(o.status));
   const completedOrders = store.orders.filter(o => o.status === "COMPLETED");
   
+  // Paniers abandonnés (Commandes PENDING créées il y a plus d'une heure)
+  const abandonedCarts = store.orders.filter(o => 
+    o.status === "PENDING" && 
+    (new Date().getTime() - new Date(o.createdAt).getTime()) > 60 * 60 * 1000
+  );
+  
   const totalRevenue = completedOrders.reduce((sum, o) => sum + o.totalAmount, 0);
   const todayRevenue = completedOrders
     .filter(o => new Date(o.createdAt).toDateString() === new Date().toDateString())
@@ -62,24 +68,12 @@ export default async function PartnerDashboardPage(props: { params: Promise<{ st
   });
   const topProducts = Object.values(productSales).sort((a, b) => b.quantity - a.quantity).slice(0, 5);
 
-  // Sales Chart Data Logic (Last 7 days)
-  const chartData = [];
-  for (let i = 6; i >= 0; i--) {
-    const d = new Date();
-    d.setDate(d.getDate() - i);
-    const dateStr = d.toLocaleDateString("fr-FR", { weekday: 'short', day: 'numeric' });
-    
-    const dayTotal = completedOrders
-      .filter(o => new Date(o.createdAt).toDateString() === d.toDateString())
-      .reduce((sum, o) => sum + o.totalAmount, 0);
-      
-    chartData.push({ date: dateStr, ventes: dayTotal });
-  }
+  // Chart is now handled by SalesChartSection
 
   return (
     <div className="space-y-8 pb-10">
       {/* KPI Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-5 gap-6">
         <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col justify-center">
           <p className="text-gray-500 font-medium text-sm">Chiffre d'Affaires (Total)</p>
           <p className="text-3xl font-black text-[#1F2937] mt-2">{totalRevenue.toFixed(2)} €</p>
@@ -100,20 +94,16 @@ export default async function PartnerDashboardPage(props: { params: Promise<{ st
           <p className="text-3xl font-black text-[#10B981] mt-2">4.8/5</p>
           <p className="text-xs text-gray-400 font-medium mt-1">Basé sur 24 avis</p>
         </div>
+        <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col justify-center">
+          <p className="text-gray-500 font-medium text-sm">Paniers Abandonnés</p>
+          <p className="text-3xl font-black text-red-500 mt-2">{abandonedCarts.length}</p>
+          <p className="text-xs text-gray-400 font-medium mt-1">Non finalisés {'>'} 1h</p>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Sales Chart Section */}
-        <div className="lg:col-span-2 bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
-          <div className="flex justify-between items-center">
-            <h3 className="text-lg font-bold text-gray-800">Évolution des Ventes (7 derniers jours)</h3>
-            <select className="bg-gray-50 border border-gray-200 text-sm rounded-xl px-3 py-1 focus:ring-[#F59E0B] outline-none">
-              <option>7 derniers jours</option>
-              <option>30 derniers jours</option>
-            </select>
-          </div>
-          <SalesChart data={chartData} />
-        </div>
+        <SalesChartSection completedOrders={completedOrders.map(o => ({ createdAt: o.createdAt, totalAmount: o.totalAmount }))} />
 
         {/* Top Products Section */}
         <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col">
