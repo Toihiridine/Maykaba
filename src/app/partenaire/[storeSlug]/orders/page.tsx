@@ -6,16 +6,20 @@ import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
-export default async function PartnerOrdersPage() {
+export default async function PartnerOrdersPage(props: { params: Promise<{ storeSlug: string }> }) {
+  const params = await props.params;
+  const { storeSlug } = params;
   const session = await getServerSession(authOptions);
   const userId = (session?.user as any)?.id;
 
+  const role = (session?.user as any)?.role;
+
   const store = await prisma.store.findFirst({
-    where: { ownerId: userId },
+    where: role === "ADMIN" ? { slug: storeSlug } : { ownerId: userId, slug: storeSlug },
     select: { id: true }
   });
 
-  if (!store) redirect("/partenaire");
+  if (!store) redirect(`/partenaire`);
 
   const orders = await prisma.order.findMany({
     where: { storeId: store.id },
@@ -101,7 +105,7 @@ export default async function PartnerOrdersPage() {
                   </td>
                   <td className="px-6 py-4 text-right">
                     <Link 
-                      href={`/partenaire/orders/${order.id}`}
+                      href={`/partenaire/${storeSlug}/orders/${order.id}`}
                       className="inline-block px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 text-xs font-bold rounded-xl transition-colors"
                     >
                       Détails & Action

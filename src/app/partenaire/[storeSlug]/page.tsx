@@ -6,13 +6,17 @@ import { prisma } from "@/lib/prisma";
 import SalesChart from "@/components/partner/SalesChart";
 import Link from "next/link";
 
-export default async function PartnerDashboardPage() {
+export default async function PartnerDashboardPage(props: { params: Promise<{ storeSlug: string }> }) {
+  const params = await props.params;
+  const { storeSlug } = params;
   const session = await getServerSession(authOptions);
   const userId = (session?.user as any)?.id;
 
-  // 1. Fetch the store belonging to this manager
+  const role = (session?.user as any)?.role;
+
+  // 1. Fetch the store belonging to this manager or by slug for admin
   const store = await prisma.store.findFirst({
-    where: { ownerId: userId },
+    where: role === "ADMIN" ? { slug: storeSlug } : { ownerId: userId, slug: storeSlug },
     include: {
       orders: {
         include: { items: { include: { product: true } }, client: true },
@@ -27,7 +31,7 @@ export default async function PartnerDashboardPage() {
       <div className="flex flex-col items-center justify-center h-64 bg-white rounded-3xl shadow-sm border border-gray-100">
         <h2 className="text-xl font-bold text-gray-800">Aucun magasin trouvé</h2>
         <p className="text-gray-500 mt-2">Veuillez configurer votre magasin dans la section "Mon Magasin".</p>
-        <Link href="/partenaire/profile" className="mt-4 px-6 py-2 bg-[#F59E0B] text-white font-semibold rounded-xl">
+        <Link href={`/partenaire/${storeSlug}/profile`} className="mt-4 px-6 py-2 bg-[#F59E0B] text-white font-semibold rounded-xl">
           Configurer mon magasin
         </Link>
       </div>
@@ -150,7 +154,7 @@ export default async function PartnerDashboardPage() {
               </span>
               Commandes nécessitant une action immédiate
             </h3>
-            <Link href="/partenaire/orders" className="text-sm font-semibold text-[#b47304] hover:underline">
+            <Link href={`/partenaire/${storeSlug}/orders`} className="text-sm font-semibold text-[#b47304] hover:underline">
               Voir tout &rarr;
             </Link>
           </div>
@@ -168,7 +172,7 @@ export default async function PartnerDashboardPage() {
                 </div>
                 <div className="text-right">
                   <p className="font-bold text-gray-800">{order.totalAmount.toFixed(2)} €</p>
-                  <Link href={`/partenaire/orders/${order.id}`} className="text-xs font-semibold text-[#0F4C81] hover:underline mt-1 inline-block">
+                  <Link href={`/partenaire/${storeSlug}/orders/${order.id}`} className="text-xs font-semibold text-[#0F4C81] hover:underline mt-1 inline-block">
                     Traiter la commande
                   </Link>
                 </div>

@@ -15,8 +15,7 @@ export async function updatePartnerOrderStatusAction(orderId: string, newStatus:
       data: { status: newStatus as any },
     });
 
-    revalidatePath("/partenaire/orders");
-    revalidatePath(`/partenaire/orders/${orderId}`);
+    revalidatePath("/partenaire", "layout");
     return { success: true };
   } catch (error) {
     console.error("Error updating order:", error);

@@ -6,12 +6,16 @@ import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import ProductForm from "../components/ProductForm";
 
-export default async function NewProductPage() {
+export default async function PartnerNewProductPage(props: { params: Promise<{ storeSlug: string }> }) {
+  const params = await props.params;
+  const { storeSlug } = params;
   const session = await getServerSession(authOptions);
   const userId = (session?.user as any)?.id;
 
+  const role = (session?.user as any)?.role;
+
   const store = await prisma.store.findFirst({
-    where: { ownerId: userId },
+    where: role === "ADMIN" ? { slug: storeSlug } : { ownerId: userId, slug: storeSlug },
     select: { id: true }
   });
 
@@ -19,7 +23,7 @@ export default async function NewProductPage() {
 
   return (
     <div className="pb-10">
-      <ProductForm storeId={store.id} />
+      <ProductForm storeId={store.id} storeSlug={storeSlug} />
     </div>
   );
 }

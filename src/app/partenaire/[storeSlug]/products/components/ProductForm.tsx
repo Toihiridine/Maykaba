@@ -8,10 +8,11 @@ import { useConfirm } from "@/providers/ConfirmProvider";
 
 interface ProductFormProps {
   storeId: string;
+  storeSlug: string;
   initialData?: any; // If editing
 }
 
-export default function ProductForm({ storeId, initialData }: ProductFormProps) {
+export default function ProductForm({ storeId, storeSlug, initialData }: ProductFormProps) {
   const router = useRouter();
   const { confirm } = useConfirm();
   const isEditing = !!initialData;
@@ -63,7 +64,7 @@ export default function ProductForm({ storeId, initialData }: ProductFormProps) 
       setMessage(`❌ ${result.error}`);
       setIsLoading(false);
     } else {
-      router.push("/partenaire/products");
+      router.push(`/partenaire/${storeSlug}/products`);
     }
   };
 
@@ -78,7 +79,7 @@ export default function ProductForm({ storeId, initialData }: ProductFormProps) 
     if (isConfirmed) {
       const res = await deleteProductAction(initialData.id);
       if (res.success) {
-        router.push("/partenaire/products");
+        router.push(`/partenaire/${storeSlug}/products`);
       } else {
         setMessage(`❌ ${res.error}`);
       }
@@ -166,7 +167,7 @@ export default function ProductForm({ storeId, initialData }: ProductFormProps) 
         </div>
 
         <div className="pt-6 border-t flex justify-end space-x-4">
-          <Link href="/partenaire/products" className="px-6 py-3 font-semibold text-gray-600 hover:bg-gray-100 rounded-xl transition-colors">
+          <Link href={`/partenaire/${storeSlug}/products`} className="px-6 py-3 font-semibold text-gray-600 hover:bg-gray-100 rounded-xl transition-colors">
             Annuler
           </Link>
           <button 

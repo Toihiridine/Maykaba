@@ -6,12 +6,16 @@ import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
-export default async function PartnerProductsPage() {
+export default async function PartnerProductsPage(props: { params: Promise<{ storeSlug: string }> }) {
+  const params = await props.params;
+  const { storeSlug } = params;
   const session = await getServerSession(authOptions);
   const userId = (session?.user as any)?.id;
 
+  const role = (session?.user as any)?.role;
+
   const store = await prisma.store.findFirst({
-    where: { ownerId: userId },
+    where: role === "ADMIN" ? { slug: storeSlug } : { ownerId: userId, slug: storeSlug },
     select: { id: true }
   });
 
@@ -30,7 +34,7 @@ export default async function PartnerProductsPage() {
           <p className="text-gray-500 text-sm">Gérez les articles visibles sur votre boutique.</p>
         </div>
         <Link 
-          href="/partenaire/products/new"
+          href={`/partenaire/${storeSlug}/products/new`}
           className="px-6 py-2 bg-[#0F4C81] text-white font-semibold rounded-xl hover:bg-[#1E3A8A] transition-colors"
         >
           + Ajouter un produit
@@ -80,7 +84,7 @@ export default async function PartnerProductsPage() {
                   </td>
                   <td className="px-6 py-4 text-right">
                     <Link 
-                      href={`/partenaire/products/${product.id}/edit`}
+                      href={`/partenaire/${storeSlug}/products/${product.id}/edit`}
                       className="inline-block px-3 py-2 text-gray-600 hover:text-[#0F4C81] text-sm font-bold transition-colors"
                     >
                       Modifier

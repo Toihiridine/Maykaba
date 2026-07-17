@@ -4,14 +4,14 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { signOut } from "next-auth/react";
 
-export default function PartnerSidebar({ storeName }: { storeName?: string }) {
+export default function PartnerSidebar({ storeName, storeSlug }: { storeName?: string, storeSlug: string }) {
   const pathname = usePathname();
 
   const navItems = [
-    { name: "Business Intelligence", path: "/partenaire", icon: "📊" },
-    { name: "Commandes", path: "/partenaire/orders", icon: "🛒" },
-    { name: "Produits", path: "/partenaire/products", icon: "📦" },
-    { name: "Mon Magasin", path: "/partenaire/profile", icon: "⚙️" },
+    { name: "Business Intelligence", path: `/partenaire/${storeSlug}`, icon: "📊" },
+    { name: "Commandes", path: `/partenaire/${storeSlug}/orders`, icon: "🛒" },
+    { name: "Produits", path: `/partenaire/${storeSlug}/products`, icon: "📦" },
+    { name: "Mon Magasin", path: `/partenaire/${storeSlug}/profile`, icon: "⚙️" },
   ];
 
   return (
@@ -23,7 +23,7 @@ export default function PartnerSidebar({ storeName }: { storeName?: string }) {
 
       <nav className="flex-1 px-4 space-y-2 mt-4">
         {navItems.map((item) => {
-          const isActive = pathname === item.path || (item.path !== "/partenaire" && pathname?.startsWith(item.path));
+          const isActive = pathname === item.path || (item.path !== `/partenaire/${storeSlug}` && pathname?.startsWith(item.path));
           return (
             <Link
               key={item.path}

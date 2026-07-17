@@ -6,12 +6,16 @@ import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import PartnerProfileForm from "./PartnerProfileForm";
 
-export default async function PartnerProfilePage() {
+export default async function PartnerProfilePage(props: { params: Promise<{ storeSlug: string }> }) {
+  const params = await props.params;
+  const { storeSlug } = params;
   const session = await getServerSession(authOptions);
   const userId = (session?.user as any)?.id;
 
+  const role = (session?.user as any)?.role;
+
   const store = await prisma.store.findFirst({
-    where: { ownerId: userId }
+    where: role === "ADMIN" ? { slug: storeSlug } : { ownerId: userId, slug: storeSlug }
   });
 
   if (!store) {

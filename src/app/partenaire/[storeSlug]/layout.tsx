@@ -5,11 +5,12 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 
-export default async function PartnerLayout({
-  children,
-}: {
+export default async function PartnerLayout(props: {
   children: React.ReactNode;
+  params: Promise<{ storeSlug: string }>;
 }) {
+  const params = await props.params;
+  const { storeSlug } = params;
   const session = await getServerSession(authOptions);
   
   if (!session || !session.user) {
@@ -26,13 +27,17 @@ export default async function PartnerLayout({
   // Fetch the store name for the sidebar
   // For now, assuming a store manager owns 1 store. We fetch the first store they own.
   const store = await prisma.store.findFirst({
-    where: { ownerId: userId },
+    where: role === "ADMIN" ? { slug: storeSlug } : { ownerId: userId, slug: storeSlug },
     select: { name: true }
   });
 
+  if (!store) {
+    redirect("/partenaire"); // Enforce correct store access
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 flex">
-      <PartnerSidebar storeName={store?.name} />
+      <PartnerSidebar storeName={store.name} storeSlug={storeSlug} />
       
       {/* Main Content */}
       <main className="flex-1 flex flex-col h-screen overflow-hidden">
@@ -51,7 +56,7 @@ export default async function PartnerLayout({
         
         {/* Page Content (Scrollable) */}
         <div className="flex-1 overflow-y-auto p-8">
-          {children}
+          {props.children}
         </div>
       </main>
     </div>

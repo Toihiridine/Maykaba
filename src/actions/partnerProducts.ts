@@ -66,7 +66,7 @@ export async function createProductAction(storeId: string, data: any) {
       }
     });
 
-    revalidatePath("/partenaire/products");
+    revalidatePath("/partenaire", "layout");
     return { success: true };
   } catch (error) {
     console.error("Create Product Error:", error);
@@ -87,7 +87,7 @@ export async function updateProductAction(productId: string, data: any) {
       }
     });
 
-    revalidatePath("/partenaire/products");
+    revalidatePath("/partenaire", "layout");
     return { success: true };
   } catch (error) {
     return { error: "Impossible de mettre à jour le produit." };
@@ -99,7 +99,7 @@ export async function deleteProductAction(productId: string) {
     await prisma.product.delete({
       where: { id: productId }
     });
-    revalidatePath("/partenaire/products");
+    revalidatePath("/partenaire", "layout");
     return { success: true };
   } catch (error) {
     return { error: "Impossible de supprimer le produit. Vérifiez qu'il n'est pas lié à une commande." };

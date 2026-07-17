@@ -15,7 +15,7 @@ export async function updateStoreProfileAction(storeId: string, data: any) {
       }
     });
 
-    revalidatePath("/partenaire/profile");
+    revalidatePath("/partenaire", "layout");
     return { success: true };
   } catch (error) {
     console.error("Update Store Error:", error);

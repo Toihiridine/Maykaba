@@ -5,11 +5,10 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import PartnerOrderActions from "./PartnerOrderActions";
 
-export default async function PartnerOrderDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  const resolvedParams = await params;
-  const orderId = resolvedParams.id;
+export default async function PartnerOrderDetailPage(props: { params: Promise<{ id: string, storeSlug: string }> }) {
+  const { id, storeSlug } = await props.params;
   const order = await prisma.order.findUnique({
-    where: { id: orderId },
+    where: { id: id },
     include: {
       client: true,
       items: { include: { product: true } },
@@ -47,7 +46,7 @@ export default async function PartnerOrderDetailPage({ params }: { params: Promi
     <div className="space-y-8 pb-10">
       {/* Header */}
       <div className="flex items-center space-x-4">
-        <Link href="/partenaire/orders" className="p-2 bg-white rounded-xl shadow-sm border border-gray-100 hover:bg-gray-50 transition-colors">
+        <Link href={`/partenaire/${storeSlug}/orders`} className="p-2 bg-white rounded-xl shadow-sm border border-gray-100 hover:bg-gray-50 transition-colors">
           <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
         </Link>
         <div>
