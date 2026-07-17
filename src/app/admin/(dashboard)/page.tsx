@@ -21,7 +21,7 @@ export default async function AdminDashboard() {
 
   // Fetch recent orders
   const recentOrders = await prisma.order.findMany({
-    take: 10,
+    take: 5,
     orderBy: { createdAt: "desc" },
     include: { client: true, store: true, courier: true }
   });
@@ -68,7 +68,7 @@ export default async function AdminDashboard() {
 
       {/* 5. DERNIÈRES COMMANDES */}
       <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-        <h3 className="text-xl font-medium text-gray-800 mb-4">Historique des Livraisons (10 dernières commandes)</h3>
+        <h3 className="text-xl font-medium text-gray-800 mb-4">Historique des Livraisons (5 dernières commandes)</h3>
         {recentOrders.length === 0 ? (
           <p className="text-gray-500">Aucune commande pour le moment.</p>
         ) : (
