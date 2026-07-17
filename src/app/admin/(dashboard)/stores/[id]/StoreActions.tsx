@@ -2,15 +2,24 @@
 
 import { useState } from "react";
 import { updateStoreAction, toggleStoreStatusAction, deleteStoreAction } from "@/actions/admin-actions";
+import { useConfirm } from "@/providers/ConfirmProvider";
 import { useRouter } from "next/navigation";
 
 export default function StoreActions({ store }: { store: any }) {
   const router = useRouter();
+  const { confirm } = useConfirm();
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   async function handleToggleStatus() {
-    if (confirm(`Voulez-vous vraiment ${store.status === "ACTIVE" ? "suspendre" : "réactiver"} ce magasin ?`)) {
+    const isConfirmed = await confirm({
+      title: "Confirmation",
+      description: `Voulez-vous vraiment ${store.status === "ACTIVE" ? "suspendre" : "réactiver"} ce magasin ?`,
+      type: "warning",
+      confirmText: store.status === "ACTIVE" ? "Suspendre" : "Réactiver"
+    });
+
+    if (isConfirmed) {
       setIsLoading(true);
       await toggleStoreStatusAction(store.id);
       setIsLoading(false);
@@ -18,7 +27,14 @@ export default function StoreActions({ store }: { store: any }) {
   }
 
   async function handleDelete() {
-    if (confirm("ATTENTION : Cette action va supprimer définitivement le magasin ET le compte du gérant associé. Continuer ?")) {
+    const isConfirmed = await confirm({
+      title: "Suppression dangereuse",
+      description: "ATTENTION : Cette action va supprimer définitivement le magasin ET le compte du gérant associé. Continuer ?",
+      type: "danger",
+      confirmText: "Supprimer définitivement"
+    });
+
+    if (isConfirmed) {
       setIsLoading(true);
       await deleteStoreAction(store.id);
       router.push("/admin/stores");

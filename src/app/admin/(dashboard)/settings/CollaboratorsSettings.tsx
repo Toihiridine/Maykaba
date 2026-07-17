@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { createCollaboratorAction, updateCollaboratorPermissionsAction, deleteCollaboratorAction } from "@/actions/collaborators";
+import { useConfirm } from "@/providers/ConfirmProvider";
 
 const AVAILABLE_PERMISSIONS = [
   { id: "admin_dashboard", label: "Tableau de Bord Principal" },
@@ -13,6 +14,7 @@ const AVAILABLE_PERMISSIONS = [
 ];
 
 export default function CollaboratorsSettings({ collaborators }: { collaborators: any[] }) {
+  const { confirm } = useConfirm();
   const [selectedPermissions, setSelectedPermissions] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState("");
@@ -45,7 +47,13 @@ export default function CollaboratorsSettings({ collaborators }: { collaborators
   };
 
   const handleDelete = async (id: string) => {
-    if (confirm("Voulez-vous vraiment supprimer ce collaborateur ?")) {
+    const isConfirmed = await confirm({
+      title: "Suppression du collaborateur",
+      description: "Voulez-vous vraiment supprimer ce collaborateur ?",
+      type: "danger",
+      confirmText: "Supprimer"
+    });
+    if (isConfirmed) {
       await deleteCollaboratorAction(id);
     }
   };

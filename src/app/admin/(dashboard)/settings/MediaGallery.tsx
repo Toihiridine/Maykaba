@@ -2,8 +2,10 @@
 
 import { useState } from "react";
 import { uploadMediaAction, deleteMediaAction } from "@/actions/media";
+import { useConfirm } from "@/providers/ConfirmProvider";
 
 export default function MediaGallery({ initialFiles, publicUrlPrefix }: { initialFiles: any[], publicUrlPrefix: string }) {
+  const { confirm } = useConfirm();
   const [isUploading, setIsUploading] = useState(false);
   const [copiedUrl, setCopiedUrl] = useState<string | null>(null);
 
@@ -25,7 +27,13 @@ export default function MediaGallery({ initialFiles, publicUrlPrefix }: { initia
   };
 
   const handleDelete = async (path: string) => {
-    if (confirm("Voulez-vous vraiment supprimer cette image ?")) {
+    const isConfirmed = await confirm({
+      title: "Supprimer l'image",
+      description: "Voulez-vous vraiment supprimer cette image ?",
+      type: "danger",
+      confirmText: "Supprimer"
+    });
+    if (isConfirmed) {
       await deleteMediaAction(path);
     }
   };

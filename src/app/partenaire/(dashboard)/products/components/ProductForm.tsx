@@ -4,6 +4,7 @@ import { useState } from "react";
 import { uploadProductImageAction, createProductAction, updateProductAction, deleteProductAction } from "@/actions/partnerProducts";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useConfirm } from "@/providers/ConfirmProvider";
 
 interface ProductFormProps {
   storeId: string;
@@ -12,6 +13,7 @@ interface ProductFormProps {
 
 export default function ProductForm({ storeId, initialData }: ProductFormProps) {
   const router = useRouter();
+  const { confirm } = useConfirm();
   const isEditing = !!initialData;
   
   const [name, setName] = useState(initialData?.name || "");
@@ -35,7 +37,13 @@ export default function ProductForm({ storeId, initialData }: ProductFormProps) 
     if (res.success && res.url) {
       setImageUrl(res.url);
     } else {
-      alert("Erreur lors de l'upload: " + res.error);
+      await confirm({ 
+        title: "Erreur", 
+        description: "Erreur lors de l'upload: " + res.error, 
+        type: "danger", 
+        confirmText: "Fermer", 
+        hideCancel: true 
+      });
     }
     setIsUploading(false);
   };
@@ -60,7 +68,14 @@ export default function ProductForm({ storeId, initialData }: ProductFormProps) 
   };
 
   const handleDelete = async () => {
-    if (confirm("Voulez-vous vraiment supprimer ce produit ?")) {
+    const isConfirmed = await confirm({
+      title: "Suppression du produit",
+      description: "Voulez-vous vraiment supprimer ce produit ?",
+      type: "danger",
+      confirmText: "Supprimer"
+    });
+
+    if (isConfirmed) {
       const res = await deleteProductAction(initialData.id);
       if (res.success) {
         router.push("/partenaire/products");
