@@ -31,5 +31,5 @@ export default withAuth(
 
 // Appliquer le middleware uniquement sur les tableaux de bord
 export const config = {
-  matcher: ["/admin/:path*", "/partenaire/:path*"],
+  matcher: ["/admin/:path*", "/partenaire/:path*", "/admin", "/partenaire"],
 };

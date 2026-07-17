@@ -19,7 +19,7 @@ export default async function PartnerLayout({
   const userId = (session.user as any).id;
 
   if (role !== "STORE_MANAGER" && role !== "ADMIN") {
-    redirect("/"); // Not a store manager or admin
+    redirect("/partenaire/login"); // Redirect to login so they can log in with correct account
   }
 
   // Fetch the store name for the sidebar

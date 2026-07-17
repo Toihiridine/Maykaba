@@ -17,6 +17,10 @@ export default async function AdminLayout({
   const permissions = (session.user as any).permissions || [];
   const role = (session.user as any).role;
 
+  if (role !== "ADMIN") {
+    redirect("/admin/login");
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 flex">
       <Sidebar userPermissions={permissions} userRole={role} />
