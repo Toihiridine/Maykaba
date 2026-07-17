@@ -39,14 +39,20 @@ export default async function PartnerDashboardPage(props: { params: Promise<{ st
   }
 
   // 2. Business Intelligence Aggregations
-  const activeOrders = store.orders.filter(o => ["PENDING", "NEGOTIATED", "PAID_ESCROW", "PREPARING", "READY_FOR_PICKUP"].includes(o.status));
+  // Commandes en attente (à préparer ou accepter)
+  const waitingOrders = store.orders.filter(o => ["NEGOTIATED", "PAID_ESCROW", "PREPARING"].includes(o.status));
+  
+  // Commandes traitées (prêtes, récupérées ou terminées)
+  const processedOrders = store.orders.filter(o => ["READY_FOR_PICKUP", "PICKED_UP", "COMPLETED"].includes(o.status));
+  
   const completedOrders = store.orders.filter(o => o.status === "COMPLETED");
   
-  // Paniers abandonnés (Commandes PENDING créées il y a plus d'une heure)
   const abandonedCarts = store.orders.filter(o => 
     o.status === "PENDING" && 
     (new Date().getTime() - new Date(o.createdAt).getTime()) > 60 * 60 * 1000
   );
+  
+  const outOfStockProducts = store.products.filter(p => !p.inStock);
   
   const totalRevenue = completedOrders.reduce((sum, o) => sum + o.totalAmount, 0);
   const todayRevenue = completedOrders
@@ -80,24 +86,24 @@ export default async function PartnerDashboardPage(props: { params: Promise<{ st
           <p className="text-xs text-green-500 font-bold mt-1">Aujourd'hui: +{todayRevenue.toFixed(2)} €</p>
         </div>
         <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col justify-center">
-          <p className="text-gray-500 font-medium text-sm">Commandes Actives</p>
-          <p className="text-3xl font-black text-[#F59E0B] mt-2">{activeOrders.length}</p>
-          <p className="text-xs text-gray-400 font-medium mt-1">Nécessitent votre attention</p>
+          <p className="text-gray-500 font-medium text-sm">Commandes en Attente</p>
+          <p className="text-3xl font-black text-[#F59E0B] mt-2">{waitingOrders.length}</p>
+          <p className="text-xs text-gray-400 font-medium mt-1">Nécessitent votre action</p>
         </div>
         <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col justify-center">
-          <p className="text-gray-500 font-medium text-sm">Produits au catalogue</p>
-          <p className="text-3xl font-black text-[#1F2937] mt-2">{store.products.length}</p>
-          <p className="text-xs text-gray-400 font-medium mt-1">{store.products.filter(p => !p.inStock).length} en rupture de stock</p>
+          <p className="text-gray-500 font-medium text-sm">Commandes Traitées</p>
+          <p className="text-3xl font-black text-[#10B981] mt-2">{processedOrders.length}</p>
+          <p className="text-xs text-gray-400 font-medium mt-1">Préparées ou livrées</p>
         </div>
         <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col justify-center">
-          <p className="text-gray-500 font-medium text-sm">Satisfaction Client</p>
-          <p className="text-3xl font-black text-[#10B981] mt-2">4.8/5</p>
-          <p className="text-xs text-gray-400 font-medium mt-1">Basé sur 24 avis</p>
+          <p className="text-gray-500 font-medium text-sm">Produits en Rupture</p>
+          <p className={`text-3xl font-black mt-2 ${outOfStockProducts.length > 0 ? 'text-red-500' : 'text-[#1F2937]'}`}>{outOfStockProducts.length}</p>
+          <p className="text-xs text-gray-400 font-medium mt-1">À réapprovisionner</p>
         </div>
         <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col justify-center">
           <p className="text-gray-500 font-medium text-sm">Paniers Abandonnés</p>
           <p className="text-3xl font-black text-red-500 mt-2">{abandonedCarts.length}</p>
-          <p className="text-xs text-gray-400 font-medium mt-1">Non finalisés {'>'} 1h</p>
+          <p className="text-xs text-gray-400 font-medium mt-1">Non finalisés</p>
         </div>
       </div>
 
@@ -134,7 +140,7 @@ export default async function PartnerDashboardPage(props: { params: Promise<{ st
       </div>
       
       {/* Recent Orders Alert */}
-      {activeOrders.length > 0 && (
+      {waitingOrders.length > 0 && (
         <div className="bg-white rounded-3xl shadow-sm border border-[#F59E0B]/30 overflow-hidden">
           <div className="bg-[#F59E0B]/10 p-4 border-b border-[#F59E0B]/20 flex justify-between items-center">
             <h3 className="font-bold text-[#b47304] flex items-center gap-2">
@@ -149,7 +155,7 @@ export default async function PartnerDashboardPage(props: { params: Promise<{ st
             </Link>
           </div>
           <div className="p-0">
-            {activeOrders.slice(0, 3).map(order => (
+            {waitingOrders.slice(0, 3).map(order => (
               <div key={order.id} className="p-4 border-b last:border-0 border-gray-100 flex justify-between items-center hover:bg-gray-50 transition-colors">
                 <div>
                   <div className="flex items-center gap-2">
