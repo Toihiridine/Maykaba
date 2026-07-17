@@ -2,12 +2,13 @@
 
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { getSettingsAction } from "./settings";
 import { revalidatePath } from "next/cache";
 
 // 1. Get Top Stores
 export async function getTopStoresAction() {
-  const session = await getServerSession();
+  const session = await getServerSession(authOptions);
   if (!session) throw new Error("Unauthorized");
 
   // Get completed orders grouped by store
@@ -37,7 +38,7 @@ export async function getTopStoresAction() {
 
 // 2. Get Abandoned Carts
 export async function getAbandonedCartsAction() {
-  const session = await getServerSession();
+  const session = await getServerSession(authOptions);
   if (!session) throw new Error("Unauthorized");
 
   // Fetch timeout setting, default 1 hour
@@ -64,7 +65,7 @@ export async function getAbandonedCartsAction() {
 
 // Simulate sending email to abandoned cart user
 export async function markAbandonedCartEmailedAction(orderId: string) {
-  const session = await getServerSession();
+  const session = await getServerSession(authOptions);
   if (!session) return { error: "Unauthorized" };
 
   try {
@@ -81,7 +82,7 @@ export async function markAbandonedCartEmailedAction(orderId: string) {
 
 // 3. Get Top Products
 export async function getTopProductsAction(startDate?: Date, endDate?: Date) {
-  const session = await getServerSession();
+  const session = await getServerSession(authOptions);
   if (!session) throw new Error("Unauthorized");
 
   let dateFilter = {};
@@ -132,7 +133,7 @@ export async function getTopProductsAction(startDate?: Date, endDate?: Date) {
 
 // 4. Get Couriers Performance
 export async function getCouriersPerformanceAction() {
-  const session = await getServerSession();
+  const session = await getServerSession(authOptions);
   if (!session) throw new Error("Unauthorized");
 
   const couriers = await prisma.user.findMany({
@@ -167,7 +168,7 @@ export async function getCouriersPerformanceAction() {
 
 // 5. Get Unassigned Orders for Manual Assignment
 export async function getPendingOrdersForAssignmentAction() {
-  const session = await getServerSession();
+  const session = await getServerSession(authOptions);
   if (!session) throw new Error("Unauthorized");
 
   // Get orders that are PAID_ESCROW (ready for pickup) but have no courier
@@ -185,7 +186,7 @@ export async function getPendingOrdersForAssignmentAction() {
 }
 
 export async function assignCourierToOrderAction(orderId: string, courierId: string) {
-  const session = await getServerSession();
+  const session = await getServerSession(authOptions);
   if (!session) return { error: "Unauthorized" };
 
   try {

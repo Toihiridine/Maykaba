@@ -1,12 +1,13 @@
 export const dynamic = "force-dynamic";
 
 import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { prisma } from "@/lib/prisma";
 import SalesChart from "@/components/partner/SalesChart";
 import Link from "next/link";
 
 export default async function PartnerDashboardPage() {
-  const session = await getServerSession();
+  const session = await getServerSession(authOptions);
   const userId = (session?.user as any)?.id;
 
   // 1. Fetch the store belonging to this manager

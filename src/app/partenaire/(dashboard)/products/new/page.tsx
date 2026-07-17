@@ -1,12 +1,13 @@
 export const dynamic = "force-dynamic";
 
 import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import ProductForm from "../components/ProductForm";
 
 export default async function NewProductPage() {
-  const session = await getServerSession();
+  const session = await getServerSession(authOptions);
   const userId = (session?.user as any)?.id;
 
   const store = await prisma.store.findFirst({
