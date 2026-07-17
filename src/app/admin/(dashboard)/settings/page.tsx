@@ -31,6 +31,7 @@ export default async function SettingsPage() {
     "stripe_prod_publishable_key",
     "stripe_prod_secret_key",
     "stripe_live_mode",
+    "abandoned_cart_timeout_hours",
   ]);
 
   // Fetch collaborators

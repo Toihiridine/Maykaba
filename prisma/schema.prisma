@@ -106,6 +106,9 @@ model Order {
   storeValidatedPickup   Boolean @default(false)
   courierValidatedPickup Boolean @default(false)
   stripePaymentId String?
+  abandonmentEmailSent Boolean @default(false)
+  deliveryDistance Float?     // Distance in km
+  deliveryTimeMins Int?       // Time taken for delivery in minutes
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
 
@@ -133,6 +136,8 @@ model CourierProfile {
   selfieUrl       String
   status          CourierStatus @default(PENDING)
   rejectionReason String?
+  acceptedOrdersCount Int @default(0)
+  refusedOrdersCount  Int @default(0)
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 

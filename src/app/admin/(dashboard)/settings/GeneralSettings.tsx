@@ -6,6 +6,7 @@ import { saveSettingsAction } from "@/actions/settings";
 export default function GeneralSettings({ initialSettings }: { initialSettings: Record<string, string> }) {
   const [logoUrl, setLogoUrl] = useState(initialSettings["maykaba_logo_url"] || "");
   const [faviconUrl, setFaviconUrl] = useState(initialSettings["maykaba_favicon_url"] || "");
+  const [cartTimeout, setCartTimeout] = useState(initialSettings["abandoned_cart_timeout_hours"] || "1");
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState("");
 
@@ -16,6 +17,7 @@ export default function GeneralSettings({ initialSettings }: { initialSettings: 
     const result = await saveSettingsAction([
       { key: "maykaba_logo_url", value: logoUrl },
       { key: "maykaba_favicon_url", value: faviconUrl },
+      { key: "abandoned_cart_timeout_hours", value: cartTimeout.toString() },
     ]);
 
     if (result.error) {
@@ -68,7 +70,28 @@ export default function GeneralSettings({ initialSettings }: { initialSettings: 
         </div>
       </div>
 
-      <div className="flex items-center space-x-4 pt-4 border-t">
+      <div className="pt-6 border-t border-gray-100">
+        <h3 className="text-lg font-bold text-gray-800 mb-4">Commandes & BI</h3>
+        <div className="space-y-2 max-w-md">
+          <label className="text-sm font-medium text-gray-700">Délai avant relance d'un panier abandonné (en heures)</label>
+          <div className="flex items-center space-x-2">
+            <input
+              type="number"
+              min="1"
+              max="72"
+              value={cartTimeout}
+              onChange={(e) => setCartTimeout(e.target.value)}
+              className="w-24 px-4 py-2 border rounded-xl focus:ring-[#F59E0B] focus:border-[#F59E0B]"
+            />
+            <span className="text-gray-500 text-sm">heures</span>
+          </div>
+          <p className="text-xs text-gray-500">
+            Une commande non validée (PENDING) sera considérée comme un panier abandonné après ce délai.
+          </p>
+        </div>
+      </div>
+
+      <div className="flex items-center space-x-4 pt-4 border-t border-gray-100">
         <button
           onClick={handleSave}
           disabled={isLoading}
