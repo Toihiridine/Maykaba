@@ -1,7 +1,7 @@
 export const dynamic = "force-dynamic";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
-import PendingOrdersList from "@/components/admin/bi/PendingOrdersList";
+import OrderTableActions from "@/components/admin/bi/OrderTableActions";
 
 export default async function AdminOrdersPage() {
   const orders = await prisma.order.findMany({
@@ -38,8 +38,6 @@ export default async function AdminOrdersPage() {
         <h3 className="text-xl font-medium text-gray-800">Toutes les Commandes</h3>
       </div>
 
-      <PendingOrdersList />
-
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <table className="w-full text-left">
           <thead className="bg-gray-50 text-gray-600">
@@ -50,12 +48,13 @@ export default async function AdminOrdersPage() {
               <th className="px-6 py-4 font-medium">Coursier</th>
               <th className="px-6 py-4 font-medium">Montant</th>
               <th className="px-6 py-4 font-medium">Statut</th>
+              <th className="px-6 py-4 font-medium text-right">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
             {orders.length === 0 ? (
               <tr>
-                <td colSpan={6} className="px-6 py-8 text-center text-gray-500">Aucune commande pour le moment.</td>
+                <td colSpan={7} className="px-6 py-8 text-center text-gray-500">Aucune commande pour le moment.</td>
               </tr>
             ) : (
               orders.map((order) => (
@@ -89,6 +88,11 @@ export default async function AdminOrdersPage() {
                   </td>
                   <td className="px-6 py-4">
                     {getStatusBadge(order.status)}
+                  </td>
+                  <td className="px-6 py-4 text-right">
+                    <div className="flex justify-end">
+                      <OrderTableActions order={order} />
+                    </div>
                   </td>
                 </tr>
               ))
