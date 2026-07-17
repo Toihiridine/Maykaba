@@ -5,7 +5,7 @@ import TopStores from "@/components/admin/bi/TopStores";
 import AbandonedCarts from "@/components/admin/bi/AbandonedCarts";
 import TopProducts from "@/components/admin/bi/TopProducts";
 import CouriersPerformance from "@/components/admin/bi/CouriersPerformance";
-import PendingOrders from "@/components/admin/bi/PendingOrders";
+import PendingOrdersSummary from "@/components/admin/bi/PendingOrdersSummary";
 
 export default async function AdminDashboard() {
   // Fetch real data from the database
@@ -52,7 +52,7 @@ export default async function AdminDashboard() {
       </div>
 
       {/* 2. COMMANDES À ASSIGNER URGENTES */}
-      <PendingOrders />
+      <PendingOrdersSummary />
 
       {/* 3. BUSINESS INTELLIGENCE - Ligne 1 */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

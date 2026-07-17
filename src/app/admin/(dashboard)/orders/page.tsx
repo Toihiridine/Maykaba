@@ -1,6 +1,7 @@
 export const dynamic = "force-dynamic";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
+import PendingOrdersList from "@/components/admin/bi/PendingOrdersList";
 
 export default async function AdminOrdersPage() {
   const orders = await prisma.order.findMany({
@@ -36,6 +37,8 @@ export default async function AdminOrdersPage() {
       <div className="flex justify-between items-center">
         <h3 className="text-xl font-medium text-gray-800">Toutes les Commandes</h3>
       </div>
+
+      <PendingOrdersList />
 
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <table className="w-full text-left">
