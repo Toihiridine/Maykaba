@@ -214,7 +214,7 @@ export default function ProductForm({ storeId, storeSlug, initialData, aiEnabled
                 className="w-5 h-5 text-[#0F4C81] rounded focus:ring-[#0F4C81] border-gray-300"
               />
               <label htmlFor="aiText" className="text-sm font-medium text-gray-800 cursor-pointer">
-                📝 Générer le nom et la description
+                📝 Extraire le nom et la description
               </label>
             </div>
             <div className="flex items-center space-x-3">
