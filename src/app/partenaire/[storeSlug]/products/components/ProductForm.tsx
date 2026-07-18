@@ -25,6 +25,9 @@ export default function ProductForm({ storeId, storeSlug, initialData, aiEnabled
   const [stockQuantity, setStockQuantity] = useState(initialData?.stockQuantity?.toString() || "0");
   const [imageUrl, setImageUrl] = useState(initialData?.imageUrl || "");
   
+  const [aiExtractText, setAiExtractText] = useState(true);
+  const [aiExtractImage, setAiExtractImage] = useState(false);
+
   const [isUploading, setIsUploading] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isAiProcessing, setIsAiProcessing] = useState(false);
@@ -32,6 +35,10 @@ export default function ProductForm({ storeId, storeSlug, initialData, aiEnabled
 
   const handleAiExtract = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || e.target.files.length === 0) return;
+    if (!aiExtractText && !aiExtractImage) {
+      // Nothing selected, just return
+      return;
+    }
     
     setIsAiProcessing(true);
     setMessage("");
@@ -42,30 +49,56 @@ export default function ProductForm({ storeId, storeSlug, initialData, aiEnabled
     for (let i = 0; i < maxFiles; i++) {
       formData.append("files", e.target.files[i]);
     }
+    formData.append("extractText", aiExtractText.toString());
+    formData.append("extractImage", aiExtractImage.toString());
     
     try {
-      const res = await fetch("/api/ai/extract-product", {
-        method: "POST",
-        body: formData,
-      });
-      
-      const data = await res.json();
-      
-      if (data.success) {
-        if (data.name) setName(data.name);
-        if (data.description) setDescription(data.description);
-        setMessage("✅ Produit analysé avec succès ! Pensez à vérifier les informations.");
-      } else {
-        await confirm({ 
-          title: "Erreur IA", 
-          description: data.error || "Impossible d'analyser l'image.", 
-          type: "danger", 
-          confirmText: "Fermer", 
-          hideCancel: true 
+      let textSuccess = false;
+      let imageSuccess = false;
+
+      // 1. Extract Text
+      if (aiExtractText) {
+        const resText = await fetch("/api/ai/extract-product", {
+          method: "POST",
+          body: formData,
         });
+        const dataText = await resText.json();
+        
+        if (dataText.success) {
+          if (dataText.name) setName(dataText.name);
+          if (dataText.description) setDescription(dataText.description);
+          textSuccess = true;
+        } else {
+          setMessage(`❌ Erreur texte: ${dataText.error}`);
+        }
       }
+
+      // 2. Remove Background (Banania/Gemini Image Ecosystem)
+      if (aiExtractImage) {
+        const resImage = await fetch("/api/ai/remove-background", {
+          method: "POST",
+          body: formData,
+        });
+        const dataImage = await resImage.json();
+
+        if (dataImage.success && dataImage.url) {
+          setImageUrl(dataImage.url);
+          imageSuccess = true;
+        } else {
+          setMessage((prev) => prev + ` | ❌ Erreur image: ${dataImage.error}`);
+        }
+      }
+
+      if ((aiExtractText && textSuccess) || (aiExtractImage && imageSuccess)) {
+        if ((aiExtractText && !textSuccess) || (aiExtractImage && !imageSuccess)) {
+          // Partial success handled by appending message
+        } else {
+          setMessage("✅ Traitement IA réussi !");
+        }
+      }
+      
     } catch (error) {
-      console.error("AI Extract Error:", error);
+      console.error("AI Processing Error:", error);
       setMessage("❌ Erreur de communication avec l'IA.");
     } finally {
       setIsAiProcessing(false);
@@ -159,43 +192,74 @@ export default function ProductForm({ storeId, storeSlug, initialData, aiEnabled
       )}
 
       {aiEnabled && !isEditing && (
-        <div className="mb-8 p-6 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-4">
-          <div>
-            <h3 className="font-bold text-[#0F4C81] flex items-center gap-2">
-              <span className="text-xl">✨</span> Scanner un produit avec l'IA
-            </h3>
-            <p className="text-sm text-blue-800/80 mt-1">
-              Prenez une ou deux photos, et Gemini rédigera automatiquement le nom et la description pour vous !
-            </p>
+        <div className="mb-8 p-6 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 rounded-2xl flex flex-col gap-4">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+            <div>
+              <h3 className="font-bold text-[#0F4C81] flex items-center gap-2">
+                <span className="text-xl">✨</span> Assistant IA Gemini
+              </h3>
+              <p className="text-sm text-blue-800/80 mt-1">
+                L'IA peut analyser vos photos pour remplir le formulaire et détourer l'image.
+              </p>
+            </div>
           </div>
           
-          <label className={`shrink-0 cursor-pointer px-6 py-3 rounded-xl font-bold text-white transition-all shadow-sm flex items-center gap-2 ${
-            isAiProcessing ? 'bg-gray-400' : 'bg-gradient-to-r from-indigo-500 to-blue-600 hover:from-indigo-600 hover:to-blue-700 shadow-blue-500/25 hover:shadow-lg hover:shadow-blue-500/40 hover:-translate-y-0.5'
-          }`}>
-            {isAiProcessing ? (
-              <>
-                <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                Analyse en cours...
-              </>
-            ) : (
-              <>
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
-                Prendre la photo
-              </>
-            )}
-            <input 
-              type="file" 
-              accept="image/*" 
-              capture="environment" 
-              multiple 
-              className="hidden" 
-              onChange={handleAiExtract} 
-              disabled={isAiProcessing} 
-            />
-          </label>
+          <div className="bg-white/60 p-4 rounded-xl border border-blue-100/50 space-y-3">
+            <div className="flex items-center space-x-3">
+              <input 
+                type="checkbox" 
+                id="aiText" 
+                checked={aiExtractText}
+                onChange={(e) => setAiExtractText(e.target.checked)}
+                className="w-5 h-5 text-[#0F4C81] rounded focus:ring-[#0F4C81] border-gray-300"
+              />
+              <label htmlFor="aiText" className="text-sm font-medium text-gray-800 cursor-pointer">
+                📝 Générer le nom et la description
+              </label>
+            </div>
+            <div className="flex items-center space-x-3">
+              <input 
+                type="checkbox" 
+                id="aiImage" 
+                checked={aiExtractImage}
+                onChange={(e) => setAiExtractImage(e.target.checked)}
+                className="w-5 h-5 text-[#0F4C81] rounded focus:ring-[#0F4C81] border-gray-300"
+              />
+              <label htmlFor="aiImage" className="text-sm font-medium text-gray-800 cursor-pointer">
+                ✂️ Détourer la photo (Enlever le fond)
+              </label>
+            </div>
+          </div>
+
+          <div className="flex justify-end">
+            <label className={`cursor-pointer px-6 py-3 rounded-xl font-bold text-white transition-all shadow-sm flex items-center gap-2 ${
+              isAiProcessing ? 'bg-gray-400' : 'bg-gradient-to-r from-indigo-500 to-blue-600 hover:from-indigo-600 hover:to-blue-700 shadow-blue-500/25 hover:shadow-lg hover:shadow-blue-500/40 hover:-translate-y-0.5'
+            }`}>
+              {isAiProcessing ? (
+                <>
+                  <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Traitement IA en cours...
+                </>
+              ) : (
+                <>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
+                  Prendre la photo
+                </>
+              )}
+              <input 
+                type="file" 
+                accept="image/*" 
+                capture="environment" 
+                multiple 
+                className="hidden" 
+                onChange={handleAiExtract} 
+                disabled={isAiProcessing} 
+              />
+            </label>
+          </div>
         </div>
       )}
 
