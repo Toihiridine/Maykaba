@@ -163,7 +163,7 @@ export default async function PartnerDashboardPage(props: { params: Promise<{ st
                       {order.status}
                     </span>
                   </div>
-                  <p className="text-xs text-gray-500 mt-1">{order.items.length} article(s) • Client: {order.client.name}</p>
+                  <p className="text-xs text-gray-500 mt-1">{order.items?.length || 0} article(s) • Client: {order.client?.name || "Client supprimé"}</p>
                 </div>
                 <div className="text-right">
                   <p className="font-bold text-gray-800">{order.totalAmount.toFixed(2)} €</p>
