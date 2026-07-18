@@ -1,7 +1,7 @@
 export const dynamic = "force-dynamic";
 
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import SalesChartSection from "@/components/partner/SalesChartSection";
 import Link from "next/link";
@@ -59,13 +59,12 @@ export default async function PartnerDashboardPage(props: { params: Promise<{ st
     .filter(o => new Date(o.createdAt).toDateString() === new Date().toDateString())
     .reduce((sum, o) => sum + o.totalAmount, 0);
 
-  // Top Products Logic
   const productSales: Record<string, { name: string, quantity: number, revenue: number }> = {};
   store.orders.forEach(order => {
     if (order.status === "COMPLETED") {
       order.items.forEach(item => {
         if (!productSales[item.productId]) {
-          productSales[item.productId] = { name: item.product.name, quantity: 0, revenue: 0 };
+          productSales[item.productId] = { name: item.product?.name || "Produit inconnu", quantity: 0, revenue: 0 };
         }
         productSales[item.productId].quantity += item.quantity;
         productSales[item.productId].revenue += (item.quantity * item.price);
