@@ -16,14 +16,14 @@ export default async function PartnerNewProductPage(props: { params: Promise<{ s
 
   const store = await prisma.store.findFirst({
     where: role === "ADMIN" ? { slug: storeSlug } : { ownerId: userId, slug: storeSlug },
-    select: { id: true }
+    select: { id: true, aiEnabled: true }
   });
 
   if (!store) redirect("/partenaire");
 
   return (
     <div className="pb-10">
-      <ProductForm storeId={store.id} storeSlug={storeSlug} />
+      <ProductForm storeId={store.id} storeSlug={storeSlug} aiEnabled={store.aiEnabled} />
     </div>
   );
 }

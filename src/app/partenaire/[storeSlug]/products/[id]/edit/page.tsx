@@ -15,7 +15,7 @@ export default async function PartnerEditProductPage(props: { params: Promise<{ 
 
   const store = await prisma.store.findFirst({
     where: role === "ADMIN" ? { slug: storeSlug } : { ownerId: userId, slug: storeSlug },
-    select: { id: true }
+    select: { id: true, aiEnabled: true }
   });
 
   if (!store) redirect("/partenaire");
@@ -30,7 +30,7 @@ export default async function PartnerEditProductPage(props: { params: Promise<{ 
 
   return (
     <div className="pb-10">
-      <ProductForm storeId={store.id} storeSlug={storeSlug} initialData={product} />
+      <ProductForm storeId={store.id} storeSlug={storeSlug} initialData={product} aiEnabled={store.aiEnabled} />
     </div>
   );
 }

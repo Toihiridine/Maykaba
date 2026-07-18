@@ -5,6 +5,7 @@ import MediaGallery from "./MediaGallery";
 import GeneralSettings from "./GeneralSettings";
 import StripeSettings from "./StripeSettings";
 import CollaboratorsSettings from "./CollaboratorsSettings";
+import AISettings from "./AISettings";
 
 interface SettingsTabsProps {
   initialFiles: any[];
@@ -14,7 +15,7 @@ interface SettingsTabsProps {
 }
 
 export default function SettingsTabs({ initialFiles, publicUrlPrefix, initialSettings, collaborators }: SettingsTabsProps) {
-  const [activeTab, setActiveTab] = useState<"general" | "stripe" | "media" | "collaborators">("general");
+  const [activeTab, setActiveTab] = useState<"general" | "stripe" | "media" | "collaborators" | "ai">("general");
 
   return (
     <div className="space-y-6">
@@ -60,6 +61,16 @@ export default function SettingsTabs({ initialFiles, publicUrlPrefix, initialSet
         >
           Collaborateurs & Droits
         </button>
+        <button
+          onClick={() => setActiveTab("ai")}
+          className={`whitespace-nowrap px-6 py-3 font-medium text-sm border-b-2 transition-colors flex items-center gap-2 ${
+            activeTab === "ai"
+              ? "border-[#F59E0B] text-[#F59E0B]"
+              : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+          }`}
+        >
+          ✨ Intelligence Artificielle
+        </button>
       </div>
 
       {/* Tabs Content */}
@@ -68,6 +79,7 @@ export default function SettingsTabs({ initialFiles, publicUrlPrefix, initialSet
         {activeTab === "stripe" && <StripeSettings initialSettings={initialSettings} />}
         {activeTab === "media" && <MediaGallery initialFiles={initialFiles} publicUrlPrefix={publicUrlPrefix} />}
         {activeTab === "collaborators" && <CollaboratorsSettings collaborators={collaborators} />}
+        {activeTab === "ai" && <AISettings initialSettings={initialSettings} />}
       </div>
     </div>
   );

@@ -80,6 +80,7 @@ export async function updateStoreAction(storeId: string, formData: FormData) {
         slug: storeSlug,
         address: address || "Adresse non définie",
         phone: storePhone || null,
+        aiEnabled: formData.get("aiEnabled") === "on",
       },
     });
 

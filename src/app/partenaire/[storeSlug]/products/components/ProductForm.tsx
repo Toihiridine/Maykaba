@@ -10,9 +10,10 @@ interface ProductFormProps {
   storeId: string;
   storeSlug: string;
   initialData?: any; // If editing
+  aiEnabled?: boolean;
 }
 
-export default function ProductForm({ storeId, storeSlug, initialData }: ProductFormProps) {
+export default function ProductForm({ storeId, storeSlug, initialData, aiEnabled }: ProductFormProps) {
   const router = useRouter();
   const { confirm } = useConfirm();
   const isEditing = !!initialData;
@@ -26,7 +27,50 @@ export default function ProductForm({ storeId, storeSlug, initialData }: Product
   
   const [isUploading, setIsUploading] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isAiProcessing, setIsAiProcessing] = useState(false);
   const [message, setMessage] = useState("");
+
+  const handleAiExtract = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || e.target.files.length === 0) return;
+    
+    setIsAiProcessing(true);
+    setMessage("");
+    
+    const formData = new FormData();
+    // Allow up to 2 files
+    const maxFiles = Math.min(e.target.files.length, 2);
+    for (let i = 0; i < maxFiles; i++) {
+      formData.append("files", e.target.files[i]);
+    }
+    
+    try {
+      const res = await fetch("/api/ai/extract-product", {
+        method: "POST",
+        body: formData,
+      });
+      
+      const data = await res.json();
+      
+      if (data.success) {
+        if (data.name) setName(data.name);
+        if (data.description) setDescription(data.description);
+        setMessage("✅ Produit analysé avec succès ! Pensez à vérifier les informations.");
+      } else {
+        await confirm({ 
+          title: "Erreur IA", 
+          description: data.error || "Impossible d'analyser l'image.", 
+          type: "danger", 
+          confirmText: "Fermer", 
+          hideCancel: true 
+        });
+      }
+    } catch (error) {
+      console.error("AI Extract Error:", error);
+      setMessage("❌ Erreur de communication avec l'IA.");
+    } finally {
+      setIsAiProcessing(false);
+    }
+  };
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || e.target.files.length === 0) return;
@@ -109,8 +153,49 @@ export default function ProductForm({ storeId, storeSlug, initialData }: Product
       </div>
 
       {message && (
-        <div className="mb-6 p-3 rounded-xl bg-red-50 text-red-600 text-sm font-medium">
+        <div className={`mb-6 p-3 rounded-xl text-sm font-medium ${message.includes('❌') ? 'bg-red-50 text-red-600' : 'bg-green-50 text-green-700'}`}>
           {message}
+        </div>
+      )}
+
+      {aiEnabled && !isEditing && (
+        <div className="mb-8 p-6 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-4">
+          <div>
+            <h3 className="font-bold text-[#0F4C81] flex items-center gap-2">
+              <span className="text-xl">✨</span> Scanner un produit avec l'IA
+            </h3>
+            <p className="text-sm text-blue-800/80 mt-1">
+              Prenez une ou deux photos, et Gemini rédigera automatiquement le nom et la description pour vous !
+            </p>
+          </div>
+          
+          <label className={`shrink-0 cursor-pointer px-6 py-3 rounded-xl font-bold text-white transition-all shadow-sm flex items-center gap-2 ${
+            isAiProcessing ? 'bg-gray-400' : 'bg-gradient-to-r from-indigo-500 to-blue-600 hover:from-indigo-600 hover:to-blue-700 shadow-blue-500/25 hover:shadow-lg hover:shadow-blue-500/40 hover:-translate-y-0.5'
+          }`}>
+            {isAiProcessing ? (
+              <>
+                <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Analyse en cours...
+              </>
+            ) : (
+              <>
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
+                Prendre la photo
+              </>
+            )}
+            <input 
+              type="file" 
+              accept="image/*" 
+              capture="environment" 
+              multiple 
+              className="hidden" 
+              onChange={handleAiExtract} 
+              disabled={isAiProcessing} 
+            />
+          </label>
         </div>
       )}
 

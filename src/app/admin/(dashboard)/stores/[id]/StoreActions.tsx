@@ -107,6 +107,22 @@ export default function StoreActions({ store }: { store: any }) {
                 <label className="text-sm font-medium">Nom du Gérant</label>
                 <input type="text" name="ownerName" defaultValue={store.owner?.name || ""} className="w-full px-4 py-2 border rounded-xl" />
               </div>
+              
+              <div className="pt-4 border-t space-y-2">
+                <h4 className="font-semibold text-[#0F4C81] flex items-center gap-2"><span>✨</span> Fonctionnalités Avancées</h4>
+                <div className="flex items-center space-x-3 p-3 bg-blue-50/50 rounded-xl border border-blue-100">
+                  <input 
+                    type="checkbox" 
+                    id="aiEnabled" 
+                    name="aiEnabled" 
+                    defaultChecked={store.aiEnabled} 
+                    className="w-5 h-5 text-[#0F4C81] rounded focus:ring-[#0F4C81] border-gray-300"
+                  />
+                  <label htmlFor="aiEnabled" className="text-sm font-medium text-gray-800 cursor-pointer">
+                    Activer la création de produits par IA (Gemini)
+                  </label>
+                </div>
+              </div>
 
               <div className="flex justify-end space-x-3 pt-4 border-t">
                 <button type="button" onClick={() => setIsEditing(false)} className="px-4 py-2 text-gray-500 hover:bg-gray-100 rounded-xl">

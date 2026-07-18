@@ -72,6 +72,7 @@ model Store {
   phone       String?
   status      StoreStatus @default(ACTIVE)
   lowStockThreshold Int @default(5)
+  aiEnabled   Boolean @default(false)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
