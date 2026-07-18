@@ -1,14 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { updatePartnerOrderStatusAction } from "@/actions/partnerOrders";
+import { updatePartnerOrderStatusAction, validateStorePickupAction } from "@/actions/partnerOrders";
 
 interface PartnerOrderActionsProps {
   orderId: string;
   currentStatus: string;
+  storeValidatedPickup: boolean;
 }
 
-export default function PartnerOrderActions({ orderId, currentStatus }: PartnerOrderActionsProps) {
+export default function PartnerOrderActions({ orderId, currentStatus, storeValidatedPickup }: PartnerOrderActionsProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState("");
 
@@ -21,6 +22,20 @@ export default function PartnerOrderActions({ orderId, currentStatus }: PartnerO
       setMessage(`❌ ${result.error}`);
     } else {
       setMessage("✅ Statut mis à jour avec succès.");
+      setTimeout(() => setMessage(""), 3000);
+    }
+    setIsLoading(false);
+  };
+
+  const handlePickupValidation = async () => {
+    setIsLoading(true);
+    setMessage("");
+
+    const result = await validateStorePickupAction(orderId);
+    if (result.error) {
+      setMessage(`❌ ${result.error}`);
+    } else {
+      setMessage("✅ Retrait validé. En attente du coursier.");
       setTimeout(() => setMessage(""), 3000);
     }
     setIsLoading(false);
@@ -83,8 +98,23 @@ export default function PartnerOrderActions({ orderId, currentStatus }: PartnerO
         )}
 
         {currentStatus === "READY_FOR_PICKUP" && (
-          <div className="text-center p-4 bg-emerald-50 rounded-xl text-emerald-800 text-sm font-medium">
-            En attente du coursier pour le retrait.
+          <div className="space-y-4">
+            {!storeValidatedPickup ? (
+              <div className="space-y-2">
+                <p className="text-sm text-gray-600">Le coursier est là ? Confirmez que vous lui avez remis la commande.</p>
+                <button
+                  onClick={handlePickupValidation}
+                  disabled={isLoading}
+                  className="w-full px-4 py-3 bg-[#1F2937] text-white font-semibold rounded-xl hover:bg-black transition-colors disabled:opacity-50"
+                >
+                  J'ai remis la commande au coursier
+                </button>
+              </div>
+            ) : (
+              <div className="text-center p-4 bg-emerald-50 rounded-xl text-emerald-800 text-sm font-medium border border-emerald-100">
+                ✅ Vous avez validé la remise. En attente de la confirmation du coursier...
+              </div>
+            )}
           </div>
         )}
 

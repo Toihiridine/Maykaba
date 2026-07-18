@@ -22,3 +22,25 @@ export async function updatePartnerOrderStatusAction(orderId: string, newStatus:
     return { error: "Erreur lors de la mise à jour de la commande." };
   }
 }
+
+export async function validateStorePickupAction(orderId: string) {
+  try {
+    const order = await prisma.order.findUnique({ where: { id: orderId } });
+    if (!order) return { error: "Commande introuvable." };
+    
+    await prisma.order.update({
+      where: { id: orderId },
+      data: { storeValidatedPickup: true },
+    });
+
+    if (order.courierValidatedPickup) {
+       await prisma.order.update({ where: { id: orderId }, data: { status: "PICKED_UP" } });
+    }
+
+    revalidatePath("/partenaire", "layout");
+    return { success: true };
+  } catch (error) {
+    console.error("Error validating pickup:", error);
+    return { error: "Erreur lors de la validation." };
+  }
+}

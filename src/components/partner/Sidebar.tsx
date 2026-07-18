@@ -4,7 +4,7 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { signOut } from "next-auth/react";
 
-export default function PartnerSidebar({ storeName, storeSlug }: { storeName?: string, storeSlug: string }) {
+export default function PartnerSidebar({ storeName, storeSlug, waitingOrdersCount = 0 }: { storeName?: string, storeSlug: string, waitingOrdersCount?: number }) {
   const pathname = usePathname();
 
   const navItems = [
@@ -28,14 +28,21 @@ export default function PartnerSidebar({ storeName, storeSlug }: { storeName?: s
             <Link
               key={item.path}
               href={item.path}
-              className={`flex items-center space-x-3 px-4 py-3 rounded-2xl transition-all ${
+              className={`flex items-center justify-between px-4 py-3 rounded-2xl transition-all ${
                 isActive
                   ? "bg-[#F59E0B] text-white font-semibold shadow-md"
                   : "text-gray-300 hover:bg-white/10 hover:text-white"
               }`}
             >
-              <span className="text-xl">{item.icon}</span>
-              <span>{item.name}</span>
+              <div className="flex items-center space-x-3">
+                <span className="text-xl">{item.icon}</span>
+                <span>{item.name}</span>
+              </div>
+              {item.name === "Commandes" && waitingOrdersCount > 0 && (
+                <span className="bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">
+                  {waitingOrdersCount}
+                </span>
+              )}
             </Link>
           );
         })}

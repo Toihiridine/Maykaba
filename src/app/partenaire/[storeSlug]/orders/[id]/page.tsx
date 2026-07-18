@@ -116,7 +116,11 @@ export default async function PartnerOrderDetailPage(props: { params: Promise<{ 
 
         {/* Sidebar Actions */}
         <div className="space-y-6">
-          <PartnerOrderActions orderId={order.id} currentStatus={order.status} />
+          <PartnerOrderActions 
+            orderId={order.id} 
+            currentStatus={order.status} 
+            storeValidatedPickup={order.storeValidatedPickup} 
+          />
 
           {/* Courier Info if any */}
           {order.courier && (

@@ -5,6 +5,7 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import OrderTableRow from "@/components/partner/OrderTableRow";
 
 export default async function PartnerOrdersPage(props: { params: Promise<{ storeSlug: string }> }) {
   const params = await props.params;
@@ -72,7 +73,6 @@ export default async function PartnerOrdersPage(props: { params: Promise<{ store
               <th className="px-6 py-4 font-bold text-sm">Client</th>
               <th className="px-6 py-4 font-bold text-sm">Montant</th>
               <th className="px-6 py-4 font-bold text-sm">Statut Actuel</th>
-              <th className="px-6 py-4 font-bold text-sm text-right">Action</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-50">
@@ -84,7 +84,7 @@ export default async function PartnerOrdersPage(props: { params: Promise<{ store
               </tr>
             ) : (
               orders.map((order) => (
-                <tr key={order.id} className="hover:bg-gray-50 transition-colors">
+                <OrderTableRow key={order.id} order={order} storeSlug={storeSlug}>
                   <td className="px-6 py-4">
                     <span className="font-bold text-gray-900">{order.orderNumber || "Non défini"}</span>
                     <div className="text-xs text-gray-500 mt-1">{order.items.length} article(s)</div>
@@ -103,15 +103,7 @@ export default async function PartnerOrdersPage(props: { params: Promise<{ store
                       {getStatusLabel(order.status)}
                     </span>
                   </td>
-                  <td className="px-6 py-4 text-right">
-                    <Link 
-                      href={`/partenaire/${storeSlug}/orders/${order.id}`}
-                      className="inline-block px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 text-xs font-bold rounded-xl transition-colors"
-                    >
-                      Détails & Action
-                    </Link>
-                  </td>
-                </tr>
+                </OrderTableRow>
               ))
             )}
           </tbody>

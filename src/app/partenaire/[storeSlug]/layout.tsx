@@ -28,16 +28,23 @@ export default async function PartnerLayout(props: {
   // For now, assuming a store manager owns 1 store. We fetch the first store they own.
   const store = await prisma.store.findFirst({
     where: role === "ADMIN" ? { slug: storeSlug } : { ownerId: userId, slug: storeSlug },
-    select: { name: true }
+    select: { id: true, name: true }
   });
 
   if (!store) {
     redirect("/partenaire"); // Enforce correct store access
   }
 
+  const waitingOrdersCount = await prisma.order.count({
+    where: {
+      storeId: store.id,
+      status: { in: ["NEGOTIATED", "PAID_ESCROW", "PREPARING"] }
+    }
+  });
+
   return (
     <div className="min-h-screen bg-gray-50 flex">
-      <PartnerSidebar storeName={store.name} storeSlug={storeSlug} />
+      <PartnerSidebar storeName={store.name} storeSlug={storeSlug} waitingOrdersCount={waitingOrdersCount} />
       
       {/* Main Content */}
       <main className="flex-1 flex flex-col h-screen overflow-hidden">
