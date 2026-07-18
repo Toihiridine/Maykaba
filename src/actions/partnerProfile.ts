@@ -12,6 +12,7 @@ export async function updateStoreProfileAction(storeId: string, data: any) {
         description: data.description,
         address: data.address,
         logoUrl: data.logoUrl,
+        lowStockThreshold: data.lowStockThreshold,
       }
     });
 

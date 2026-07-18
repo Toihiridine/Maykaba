@@ -49,6 +49,29 @@ export async function POST(request: Request) {
       }
     });
 
+    // Mettre à jour les stocks
+    for (const item of orderItemsData) {
+      const updatedProduct = await prisma.product.update({
+        where: { id: item.productId },
+        data: {
+          stockQuantity: {
+            decrement: item.quantity
+          }
+        }
+      });
+
+      // Si le stock tombe à 0 ou en dessous, on décoche inStock
+      if (updatedProduct.stockQuantity <= 0) {
+        await prisma.product.update({
+          where: { id: item.productId },
+          data: {
+            inStock: false,
+            stockQuantity: 0 // Pour éviter les nombres négatifs
+          }
+        });
+      }
+    }
+
     // Demander à Stripe un PaymentIntent pour cette commande
     const stripeResult = await createPaymentIntentForOrder(order.id, totalAmount);
 

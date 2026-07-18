@@ -13,6 +13,7 @@ export default function PartnerProfileForm({ store }: PartnerProfileFormProps) {
   const [description, setDescription] = useState(store.description || "");
   const [address, setAddress] = useState(store.address || "");
   const [logoUrl, setLogoUrl] = useState(store.logoUrl || "");
+  const [lowStockThreshold, setLowStockThreshold] = useState(store.lowStockThreshold?.toString() || "5");
   
   const [isUploading, setIsUploading] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -39,7 +40,13 @@ export default function PartnerProfileForm({ store }: PartnerProfileFormProps) {
     setIsLoading(true);
     setMessage("");
 
-    const data = { name, description, address, logoUrl };
+    const data = { 
+      name, 
+      description, 
+      address, 
+      logoUrl,
+      lowStockThreshold: parseInt(lowStockThreshold) || 5
+    };
     const result = await updateStoreProfileAction(store.id, data);
 
     if (result.error) {
@@ -105,6 +112,22 @@ export default function PartnerProfileForm({ store }: PartnerProfileFormProps) {
             className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-[#F59E0B] focus:border-[#F59E0B] transition-colors resize-none"
             placeholder="Présentez votre magasin, vos spécialités..."
           />
+        </div>
+
+        {/* Stock Management Section */}
+        <div className="p-5 bg-gray-50 border border-gray-100 rounded-2xl">
+          <h4 className="font-bold text-gray-800 text-sm mb-4">Gestion de Stock</h4>
+          <div>
+            <label className="text-sm font-medium text-gray-700 block mb-1">Seuil d'alerte de stock faible</label>
+            <input 
+              required type="number" min="0" value={lowStockThreshold} onChange={(e)=>setLowStockThreshold(e.target.value)}
+              className="w-full md:w-1/2 px-4 py-3 border border-gray-200 rounded-xl focus:ring-[#F59E0B] focus:border-[#F59E0B] transition-colors bg-white"
+              placeholder="Ex: 5"
+            />
+            <p className="text-xs text-gray-500 mt-2">
+              Le tableau de bord affichera une alerte pour les produits dont le stock atteint ou descend en dessous de ce nombre.
+            </p>
+          </div>
         </div>
 
         {/* Stripe Info Box */}

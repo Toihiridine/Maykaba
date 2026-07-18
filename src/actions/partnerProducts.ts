@@ -62,6 +62,7 @@ export async function createProductAction(storeId: string, data: any) {
         description: data.description,
         price: parseFloat(data.price),
         inStock: data.inStock,
+        stockQuantity: data.stockQuantity,
         imageUrl: data.imageUrl,
       }
     });
@@ -83,6 +84,7 @@ export async function updateProductAction(productId: string, data: any) {
         description: data.description,
         price: parseFloat(data.price),
         inStock: data.inStock,
+        stockQuantity: data.stockQuantity,
         imageUrl: data.imageUrl,
       }
     });

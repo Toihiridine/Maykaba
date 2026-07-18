@@ -21,6 +21,7 @@ export default function ProductForm({ storeId, storeSlug, initialData }: Product
   const [description, setDescription] = useState(initialData?.description || "");
   const [price, setPrice] = useState(initialData?.price?.toString() || "");
   const [inStock, setInStock] = useState(initialData ? initialData.inStock : true);
+  const [stockQuantity, setStockQuantity] = useState(initialData?.stockQuantity?.toString() || "0");
   const [imageUrl, setImageUrl] = useState(initialData?.imageUrl || "");
   
   const [isUploading, setIsUploading] = useState(false);
@@ -54,7 +55,14 @@ export default function ProductForm({ storeId, storeSlug, initialData }: Product
     setIsLoading(true);
     setMessage("");
 
-    const data = { name, description, price, inStock, imageUrl };
+    const data = { 
+      name, 
+      description, 
+      price, 
+      inStock, 
+      stockQuantity: parseInt(stockQuantity) || 0,
+      imageUrl 
+    };
     
     const result = isEditing 
       ? await updateProductAction(initialData.id, data)
@@ -156,14 +164,27 @@ export default function ProductForm({ storeId, storeSlug, initialData }: Product
           />
         </div>
 
-        <div className="flex items-center space-x-3 p-4 bg-gray-50 rounded-xl border border-gray-100">
-          <input 
-            type="checkbox" id="inStock" checked={inStock} onChange={(e)=>setInStock(e.target.checked)}
-            className="w-5 h-5 text-[#F59E0B] rounded focus:ring-[#F59E0B] border-gray-300"
-          />
-          <label htmlFor="inStock" className="text-sm font-medium text-gray-800 cursor-pointer">
-            Produit disponible (En stock)
-          </label>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="flex items-center space-x-3 p-4 bg-gray-50 rounded-xl border border-gray-100 h-full">
+            <input 
+              type="checkbox" id="inStock" checked={inStock} onChange={(e)=>setInStock(e.target.checked)}
+              className="w-5 h-5 text-[#F59E0B] rounded focus:ring-[#F59E0B] border-gray-300"
+            />
+            <label htmlFor="inStock" className="text-sm font-medium text-gray-800 cursor-pointer">
+              Produit disponible (En stock)
+            </label>
+          </div>
+          
+          {inStock && (
+            <div>
+              <label className="text-sm font-medium text-gray-700 block mb-1">Quantité en stock</label>
+              <input 
+                required type="number" min="0" value={stockQuantity} onChange={(e)=>setStockQuantity(e.target.value)}
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-[#F59E0B] focus:border-[#F59E0B] transition-colors"
+                placeholder="Ex: 50"
+              />
+            </div>
+          )}
         </div>
 
         <div className="pt-6 border-t flex justify-end space-x-4">

@@ -54,6 +54,7 @@ export default async function PartnerDashboardPage(props: { params: Promise<{ st
     );
     
     const outOfStockProducts = store.products.filter(p => !p.inStock);
+    const lowStockProducts = store.products.filter(p => p.inStock && p.stockQuantity > 0 && p.stockQuantity <= (store.lowStockThreshold || 5));
     
     const totalRevenue = completedOrders.reduce((sum, o) => sum + (o.totalAmount || 0), 0);
     const todayRevenue = completedOrders
@@ -182,6 +183,33 @@ export default async function PartnerDashboardPage(props: { params: Promise<{ st
                       Traiter la commande
                     </Link>
                   </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Low Stock Alert */}
+        {lowStockProducts.length > 0 && (
+          <div className="bg-white rounded-3xl shadow-sm border border-red-500/30 overflow-hidden mt-6">
+            <div className="bg-red-50 p-4 border-b border-red-500/20 flex justify-between items-center">
+              <h3 className="font-bold text-red-700 flex items-center gap-2">
+                ⚠️ Alerte de Stock Faible
+              </h3>
+              <Link href={`/partenaire/${storeSlug}/products`} className="text-sm font-semibold text-red-700 hover:underline">
+                Gérer les stocks &rarr;
+              </Link>
+            </div>
+            <div className="p-0">
+              {lowStockProducts.map(product => (
+                <div key={product.id} className="p-4 border-b last:border-0 border-gray-100 flex justify-between items-center hover:bg-gray-50 transition-colors">
+                  <div>
+                    <p className="font-bold text-gray-800">{product.name}</p>
+                    <p className="text-xs text-red-500 font-semibold mt-1">Il ne reste plus que {product.stockQuantity} unité(s) en stock !</p>
+                  </div>
+                  <Link href={`/partenaire/${storeSlug}/products/${product.id}/edit`} className="text-sm font-semibold text-[#0F4C81] hover:underline bg-gray-100 px-3 py-1 rounded-lg">
+                    Mettre à jour
+                  </Link>
                 </div>
               ))}
             </div>

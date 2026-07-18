@@ -71,6 +71,7 @@ model Store {
   stripeAccountId String? // For Stores (Stripe Connect)
   phone       String?
   status      StoreStatus @default(ACTIVE)
+  lowStockThreshold Int @default(5)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -87,6 +88,7 @@ model Product {
   price       Float
   imageUrl    String?
   inStock     Boolean  @default(true)
+  stockQuantity Int    @default(0)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
