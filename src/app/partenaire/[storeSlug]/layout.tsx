@@ -39,7 +39,7 @@ export default async function PartnerLayout(props: {
     const waitingOrdersCount = await prisma.order.count({
       where: {
         storeId: store.id,
-        status: { in: ["NEGOTIATED", "PAID_ESCROW", "PREPARING"] }
+        status: { in: ["NEGOTIATED", "PAID_ESCROW"] }
       }
     });
 
