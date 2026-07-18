@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { updateSettingAction } from "@/actions/settings";
+import { saveSettingsAction } from "@/actions/settings";
 import { useConfirm } from "@/providers/ConfirmProvider";
 
 interface AISettingsProps {
@@ -17,7 +17,7 @@ export default function AISettings({ initialSettings }: AISettingsProps) {
     e.preventDefault();
     setIsLoading(true);
 
-    const result = await updateSettingAction("gemini_api_key", apiKey);
+    const result = await saveSettingsAction([{ key: "gemini_api_key", value: apiKey }]);
 
     if (result.success) {
       await confirm({
