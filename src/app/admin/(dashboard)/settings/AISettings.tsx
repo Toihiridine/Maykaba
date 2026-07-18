@@ -30,7 +30,7 @@ export default function AISettings({ initialSettings }: AISettingsProps) {
     } else {
       await confirm({
         title: "Erreur",
-        description: result.error,
+        description: result.error || "Une erreur inconnue est survenue",
         type: "danger",
         confirmText: "Fermer",
         hideCancel: true
