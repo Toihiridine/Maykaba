@@ -41,7 +41,7 @@ export default async function PartnerDashboardPage(props: { params: Promise<{ st
 
     // 2. Business Intelligence Aggregations
     // Commandes en attente (à préparer ou accepter)
-    const waitingOrders = store.orders.filter(o => ["NEGOTIATED", "PAID_ESCROW"].includes(o.status));
+    const waitingOrders = store.orders.filter(o => ["NEGOTIATED", "PAID_ESCROW", "PREPARING"].includes(o.status));
     
     // Commandes traitées (prêtes, récupérées ou terminées)
     const processedOrders = store.orders.filter(o => ["READY_FOR_PICKUP", "PICKED_UP", "COMPLETED"].includes(o.status));
