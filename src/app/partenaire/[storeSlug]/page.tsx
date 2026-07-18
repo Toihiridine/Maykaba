@@ -108,7 +108,7 @@ export default async function PartnerDashboardPage(props: { params: Promise<{ st
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Sales Chart Section */}
-        <SalesChartSection completedOrders={completedOrders.map(o => ({ createdAt: o.createdAt, totalAmount: o.totalAmount }))} />
+        <SalesChartSection completedOrders={completedOrders.map(o => ({ createdAt: o.createdAt.toISOString(), totalAmount: o.totalAmount }))} />
 
         {/* Top Products Section */}
         <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col">

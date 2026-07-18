@@ -4,7 +4,7 @@ import { useState, useMemo } from "react";
 import SalesChart from "./SalesChart";
 
 interface SalesChartSectionProps {
-  completedOrders: { createdAt: Date; totalAmount: number }[];
+  completedOrders: { createdAt: string; totalAmount: number }[];
 }
 
 export default function SalesChartSection({ completedOrders }: SalesChartSectionProps) {
